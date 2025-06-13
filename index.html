@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Imágenes Superpuestas con Movimiento</title>
+  <style>
+    .contenedor {
+      position: relative;
+      width: 289px;
+      height: 600px; /* Para evitar scroll */
+      overflow: hidden;
+      border: 1px solid #ccc;
+      margin: 20px auto;
+    }
+
+    .imagen1, .imagen2 {
+      width: 289px;
+    }
+
+    .imagen1 {
+      position: relative;
+      z-index: 2;
+    }
+
+    .imagen2 {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+      transition: top 0.3s ease;
+    }
+
+    .controles {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    button {
+      padding: 6px 12px;
+      margin: 0 5px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="controles">
+    <button onclick="mover(-20)">⬆️ Subir</button>
+    <button onclick="mover(20)">⬇️ Bajar</button>
+  </div>
+
+  <div class="contenedor">
+    <img src="2.png" alt="Imagen detrás" class="imagen2" id="fondo">
+    <img src="1.png" alt="Imagen delante" class="imagen1">
+  </div>
+
+  <script>
+    let posicion = 0;
+    function mover(cambio) {
+      posicion += cambio;
+      document.getElementById('fondo').style.top = posicion + "px";
+    }
+  </script>
+
+</body>
+</html>
