@@ -1,0 +1,18 @@
+#installBtn{
+  position:fixed;
+  right:16px;
+  bottom:16px;
+  padding:8px 16px;
+  font-size:14px;
+  font-weight:700;
+  border-radius:8px;
+  border:1px solid #0078d7;
+  background:#ffffffcc;
+  color:#0078d7;
+  cursor:pointer;
+  z-index:500;
+  display:none;
+}
+#installBtn:hover{
+  background:#ffffff;
+}
