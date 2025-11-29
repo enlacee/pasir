@@ -1,0 +1,1345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pasir Industrial – Packs, Cursos y LOGICSOFT</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta id="theme-color-meta" name="theme-color" content="#f3f4f6" />
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      color-scheme: dark light;
+
+      --bg: #0b1220;
+      --bg-soft: radial-gradient(circle at top, rgba(56,189,248,0.18), transparent 55%);
+      --bg-header: rgba(15,23,42,0.96);
+      --bg-elevated: rgba(15,23,42,0.98);
+      --border-subtle: rgba(148,163,184,0.28);
+      --accent: #10b981;
+      --accent-soft: #22c55e;
+      --accent-strong: #0ea5e9;
+      --accent-text: #052e16;
+      --text-main: #f9fafb;
+      --text-soft: #e5e7eb;
+      --text-muted: #9ca3af;
+      --chip-bg: rgba(15,23,42,0.9);
+      --chip-text: #a5b4fc;
+      --price: #fbbf24;
+      --shadow-card: 0 18px 45px rgba(15,23,42,0.85);
+      --shadow-soft: 0 10px 30px rgba(15,23,42,0.6);
+      --radius-card: 0.9rem;
+      --radius-pill: 999px;
+      --transition-fast: 0.18s ease-out;
+      --transition-med: 0.25s ease-out;
+    }
+
+    body[data-theme="light"] {
+      --bg: #f3f4f6;
+      --bg-soft: radial-gradient(circle at top, rgba(59,130,246,0.12), transparent 55%);
+      --bg-header: rgba(255,255,255,0.96);
+      --bg-elevated: #ffffff;
+      --border-subtle: rgba(148,163,184,0.45);
+      --accent: #0d9488;
+      --accent-soft: #22c55e;
+      --accent-strong: #2563eb;
+      --accent-text: #064e3b;
+      --text-main: #0f172a;
+      --text-soft: #111827;
+      --text-muted: #6b7280;
+      --chip-bg: #e0f2fe;
+      --chip-text: #0369a1;
+      --price: #b45309;
+      --shadow-card: 0 16px 40px rgba(15,23,42,0.12);
+      --shadow-soft: 0 10px 30px rgba(15,23,42,0.08);
+    }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Arial, sans-serif;
+      background:
+        var(--bg-soft),
+        radial-gradient(circle at bottom, rgba(16,185,129,0.16), transparent 60%),
+        var(--bg);
+      color: var(--text-main);
+      line-height: 1.5;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(16px);
+      background: var(--bg-header);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .header-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0.8rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.6);
+      object-fit: cover;
+      background: #0f172a;
+    }
+
+    .header-title {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    header h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+      color: var(--text-soft);
+    }
+
+    header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid var(--border-subtle);
+      background: rgba(15,23,42,0.7);
+      color: var(--text-soft);
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background var(--transition-fast), transform var(--transition-fast),
+        box-shadow var(--transition-fast), border-color var(--transition-fast);
+      box-shadow: var(--shadow-soft);
+    }
+
+    body[data-theme="light"] .theme-toggle {
+      background: #f9fafb;
+    }
+
+    .theme-toggle span.icon {
+      font-size: 1rem;
+    }
+
+    .theme-toggle:hover {
+      transform: translateY(-1px);
+      border-color: var(--accent-strong);
+      box-shadow: 0 10px 25px rgba(8,47,73,0.35);
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 1.5rem auto 3rem;
+      padding: 0 1rem 2rem;
+      width: 100%;
+      flex: 1;
+    }
+
+    section {
+      margin-bottom: 2.7rem;
+    }
+
+    section h2 {
+      font-size: 1.35rem;
+      margin-bottom: 0.4rem;
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+    }
+
+    section h2::before {
+      content: "";
+      display: inline-block;
+      width: 4px;
+      height: 1.2rem;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--accent-strong), var(--accent));
+    }
+
+    section p.section-intro {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    .packs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--bg-elevated);
+      border-radius: var(--radius-card);
+      padding: 1.25rem 1.25rem 1.5rem;
+      border: 1px solid var(--border-subtle);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 260px;
+      box-shadow: var(--shadow-card);
+      transition: transform var(--transition-med), box-shadow var(--transition-med),
+        border-color var(--transition-med), background var(--transition-med);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(34,197,94,0.14), transparent 60%);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity var(--transition-med);
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 22px 50px rgba(15,23,42,0.65);
+      border-color: rgba(56,189,248,0.6);
+    }
+
+    .card:hover::after {
+      opacity: 1;
+    }
+
+    .pack-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--chip-text);
+      background: var(--chip-bg);
+      border-radius: var(--radius-pill);
+      padding: 0.12rem 0.55rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.32rem;
+      margin-bottom: 0.4rem;
+      border: 1px solid rgba(129,140,248,0.35);
+    }
+
+    .pack-label::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: radial-gradient(circle, var(--accent-strong), var(--accent));
+    }
+
+    .pack-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+      color: var(--text-soft);
+    }
+
+    .pack-subtitle {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-bottom: 0.75rem;
+    }
+
+    .pack-list,
+    .course-list {
+      list-style: none;
+      margin-bottom: 1rem;
+    }
+
+    .pack-list li,
+    .course-list li {
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+      padding-left: 1.1rem;
+      position: relative;
+      color: var(--text-main);
+    }
+
+    .pack-list li::before,
+    .course-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--accent-soft);
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .pack-price,
+    .course-meta {
+      font-weight: 700;
+      margin-bottom: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--price);
+    }
+
+    .course-meta {
+      margin-top: 0.35rem;
+    }
+
+    .actions {
+      margin-top: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .btn-whatsapp,
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border-radius: var(--radius-pill);
+      border: 1px solid transparent;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: background var(--transition-fast), transform var(--transition-fast),
+        box-shadow var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-whatsapp {
+      background: linear-gradient(135deg, var(--accent-soft), #16a34a);
+      color: var(--accent-text);
+      box-shadow: 0 10px 25px rgba(21,128,61,0.65);
+    }
+
+    .btn-whatsapp:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 14px 30px rgba(21,128,61,0.85);
+      border-color: rgba(22,163,74,0.8);
+    }
+
+    .btn-whatsapp img.btn-whatsapp-icon {
+      width: 18px;
+      height: 18px;
+      display: block;
+    }
+
+    .btn-secondary {
+      background: transparent;
+      color: var(--text-soft);
+      border-color: var(--border-subtle);
+      box-shadow: none;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(15,23,42,0.7);
+      border-color: rgba(56,189,248,0.8);
+      box-shadow: var(--shadow-soft);
+    }
+
+    body[data-theme="light"] .btn-secondary:hover {
+      background: #eff6ff;
+    }
+
+    .course-image {
+      width: 100%;
+      max-height: 170px;
+      object-fit: cover;
+      border-radius: 0.7rem;
+      margin-bottom: 0.75rem;
+      border: 1px solid rgba(148,163,184,0.5);
+      box-shadow: 0 14px 30px rgba(15,23,42,0.55);
+    }
+
+    body[data-theme="light"] .course-image {
+      box-shadow: 0 14px 30px rgba(15,23,42,0.18);
+    }
+
+    .logicsoft-wrapper {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(0, 1.4fr);
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .logicsoft-wrapper {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .logicsoft-box {
+      background: var(--bg-elevated);
+      border-radius: var(--radius-card);
+      padding: 1.25rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-card);
+    }
+
+    .logicsoft-options {
+      margin: 0.75rem 0 0.5rem;
+      display: grid;
+      gap: 0.4rem;
+    }
+
+    .logicsoft-option-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.9rem;
+      color: var(--text-soft);
+    }
+
+    .logicsoft-option-item input {
+      accent-color: var(--accent-soft);
+    }
+
+    footer {
+      text-align: center;
+      padding: 1.5rem 1rem 2rem;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      border-top: 1px solid rgba(148,163,184,0.26);
+      background: linear-gradient(to top, rgba(15,23,42,0.95), transparent);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15,23,42,0.82);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 50;
+      backdrop-filter: blur(10px);
+    }
+
+    .modal {
+      background: var(--bg-elevated);
+      border-radius: 0.9rem;
+      max-width: 480px;
+      width: 90%;
+      padding: 1.25rem 1.5rem 1.5rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 26px 60px rgba(0,0,0,0.85);
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      gap: 0.5rem;
+    }
+
+    .modal-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-soft);
+    }
+
+    .modal-close {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.35rem;
+      cursor: pointer;
+      padding: 0;
+      line-height: 1;
+      border-radius: 999px;
+      width: 28px;
+      height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: background var(--transition-fast), color var(--transition-fast),
+        transform var(--transition-fast);
+    }
+
+    .modal-close:hover {
+      background: rgba(15,23,42,0.7);
+      color: var(--text-soft);
+      transform: translateY(-1px);
+    }
+
+    .modal-body p {
+      font-size: 0.9rem;
+      color: var(--text-main);
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-body ul {
+      list-style: none;
+      margin-top: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .modal-body li {
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+      padding-left: 1.1rem;
+      position: relative;
+      color: var(--text-soft);
+    }
+
+    .modal-body li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--accent-soft);
+    }
+
+    @media (max-width: 640px) {
+      .header-inner {
+        align-items: flex-start;
+      }
+      header h1 {
+        font-size: 1.15rem;
+      }
+    }
+
+    /* ==== SLIDER LOGICSOFT (8 IMÁGENES, AUTO + FLECHAS) ==== */
+    .logicsoft-simple {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+      gap: 1.6rem;
+      align-items: center;
+    }
+
+    @media (max-width: 768px) {
+      .logicsoft-simple {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .logicsoft-slider {
+      width: 100%;
+      overflow: hidden;
+      border-radius: var(--radius-card);
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-card);
+      position: relative;
+    }
+
+    .slider-track {
+      display: flex;
+      transition: transform 0.7s ease-in-out;
+    }
+
+    .logicsoft-slider img {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 340px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .slider-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border-radius: 999px;
+      border: 1px solid rgba(148,163,184,0.8);
+      background: rgba(15,23,42,0.75);
+      color: #e5e7eb;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 1.2rem;
+      line-height: 1;
+      z-index: 2;
+      transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+    }
+
+    .slider-arrow:hover {
+      background: rgba(15,23,42,0.95);
+      border-color: var(--accent-strong);
+      transform: translateY(-50%) scale(1.05);
+    }
+
+    .slider-prev {
+      left: 0.6rem;
+    }
+
+    .slider-next {
+      right: 0.6rem;
+    }
+
+    @media (max-width: 640px) {
+      .logicsoft-slider img {
+        height: 260px;
+      }
+      .slider-arrow {
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+      }
+    }
+
+    /* ==== SLIDER CALCMOTOR (4 IMÁGENES VERTICALES) ==== */
+    .calcmotor-slider {
+      width: 100%;
+      max-width: 360px;
+      margin: 0.8rem auto 0;
+      overflow: hidden;
+      border-radius: 1rem;
+      border: 1px solid var(--border-subtle);
+      box-shadow: var(--shadow-card);
+      background: #020617;
+    }
+
+    body[data-theme="light"] .calcmotor-slider {
+      background: #0b1120;
+    }
+
+    .cal-slider-track {
+      display: flex;
+      transition: transform 0.7s ease-in-out;
+    }
+
+    .calcmotor-slider img {
+      flex: 0 0 100%;
+      width: 100%;
+      height: 420px;        /* más alto para capturas verticales */
+      object-fit: contain;  /* respeta formato del celular */
+      background: #020617;
+      display: block;
+    }
+
+    @media (max-width: 640px) {
+      .calcmotor-slider img {
+        height: 380px;
+      }
+    }
+
+  </style>
+</head>
+<body data-theme="light">
+  <header>
+    <div class="header-inner">
+      <div class="brand-wrap">
+        <img src="img/logo-pasir.png" alt="Logo Pasir Industrial" class="brand-logo">
+        <div class="header-title">
+          <h1>Pasir Industrial</h1>
+          <p>Escuela técnica online de electricidad, automatización</p>
+        </div>
+      </div>
+      <button id="theme-toggle" class="theme-toggle" type="button">
+        <span class="icon" id="theme-icon">☀️</span>
+        <span id="theme-label">Modo claro</span>
+      </button>
+    </div>
+  </header>
+
+  <main>
+
+    <!-- ===================== PACKS ===================== -->
+    <section id="packs">
+      <h2>Packs de manuales y clases grabadas</h2>
+      <p class="section-intro">
+        Escoge el pack que mejor se adapte a lo que necesitas. Los cursos incluidos son clases grabadas de cursos
+        anteriores.
+      </p>
+
+      <div class="packs-grid">
+
+        <!-- PACK 1 -->
+        <article class="card">
+          <div>
+            <div class="pack-label">Pack 1</div>
+            <h3 class="pack-title">Mega Pack Industrial (incluye todo)</h3>
+            <p class="pack-subtitle">
+              Manuales + clases grabadas de cursos anteriores + grupo de WhatsApp + apps didácticas.
+            </p>
+
+            <ul class="pack-list">
+              <li>Más de 100 manuales en PDF de distintas áreas.</li>
+              <li>Clases grabadas de cursos anteriores.</li>
+              <li>Grupo privado de WhatsApp.</li>
+              <li>Apps y recursos didácticos incluidos.</li>
+            </ul>
+
+            <div class="pack-price">
+              S/49 &mdash; $18 USD
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn-secondary btn-detalles" data-detalle-id="detalle-pack1">
+              Ver detalles
+            </button>
+            <a class="btn-whatsapp" href="https://wa.link/d5bzhr" target="_blank" rel="noopener noreferrer">
+              <img src="whatsapp.png" alt="WhatsApp" class="btn-whatsapp-icon">
+              <span>COMPRAR AHORA</span>
+            </a>
+          </div>
+        </article>
+
+            <!-- PACK 2 -->
+        <article class="card">
+          <div>
+            <div class="pack-label">Pack 2</div>
+            <h3 class="pack-title">Pack Manuales + clases grabadas</h3>
+            <p class="pack-subtitle">
+              Manuales + clases grabadas de cursos anteriores, más grupo de WhatsApp.
+            </p>
+
+            <ul class="pack-list">
+              <li>Más de 100 manuales en PDF.</li>
+              <li>clases grabadas de cursos anteriores.</li>
+              <li>Grupo privado de WhatsApp.</li>
+              <li>App CalcMotor, calculadorara para dimensionar dispositivos de arranque en motor trifásico.</li>
+            </ul>
+
+            <div class="pack-price">
+              S/39 — $15 USD
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn-secondary btn-detalles" data-detalle-id="detalle-pack2">
+              Ver detalles
+            </button>
+            <a class="btn-whatsapp" href="https://wa.link/a6eac9" target="_blank" rel="noopener noreferrer">
+              <img src="whatsapp.png" alt="WhatsApp" class="btn-whatsapp-icon">
+              <span>COMPRAR AHORA</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- PACK 3 -->
+        <article class="card">
+          <div>
+            <div class="pack-label">Pack 3</div>
+            <h3 class="pack-title">Pack Solo Manuales (+100)</h3>
+            <p class="pack-subtitle">
+              Acceso a todos los manuales (+100) para estudio autónomo, sin cursos grabados.
+            </p>
+
+            <ul class="pack-list">
+              <li>Más de 100 manuales en PDF en diferentes áreas.</li>
+              <li>Contenido ideal para reforzar teoría y práctica por tu cuenta.</li>
+              <li> + App CalcMotor.</li>
+            </ul>
+
+            <div class="pack-price">
+              S/29 &mdash; $10 USD
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn-secondary btn-detalles" data-detalle-id="detalle-pack3">
+              Ver detalles
+            </button>
+            <a class="btn-whatsapp" href="https://wa.link/0kjsjz" target="_blank" rel="noopener noreferrer">
+              <img src="whatsapp.png" alt="WhatsApp" class="btn-whatsapp-icon">
+              <span>COMPRAR AHORA</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- PACK 4 -->
+        <article class="card">
+          <div>
+            <div class="pack-label">Pack 4</div>
+            <h3 class="pack-title">Pack Manuales por área</h3>
+            <p class="pack-subtitle">
+              Solo manuales del área que elijas: industrial, neumática/hidráulica, automatización o domiciliaria.
+            </p>
+
+            <ul class="pack-list">
+              <li>Manuales de <strong>Electricidad industrial</strong>.</li>
+              <li>o de <strong>Neumática / Hidráulica</strong>.</li>
+              <li>o de <strong>Automatización industrial</strong>.</li>
+              <li>o de <strong>Electricidad domiciliaria y domótica</strong>.</li>
+              <li> + App CalcMotor.</li>
+            </ul>
+
+            <div class="pack-price">
+              S/15 &mdash; $7 USD
+            </div>
+          </div>
+
+          <div class="actions">
+            <button class="btn-secondary btn-detalles" data-detalle-id="detalle-pack4">
+              Ver detalles
+            </button>
+            <a class="btn-whatsapp" href="https://wa.link/cjd7px" target="_blank" rel="noopener noreferrer">
+              <img src="whatsapp.png" alt="WhatsApp" class="btn-whatsapp-icon">
+              <span>COMPRAR AHORA</span>
+            </a>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ===================== CURSOS EN VIVO ===================== -->
+    <section id="cursos-en-vivo">
+      <h2>Cursos en vivo</h2>
+      <p class="section-intro">
+        Estos cursos se dictan por Zoom en fechas específicas. Aquí podrás ver su contenido, precio y contactarme por WhatsApp.
+      </p>
+
+      <div class="packs-grid">
+
+        <!-- CURSO 1: Electricidad Industrial -->
+        <article class="card">
+          <div>
+            <img src="curso_elec_industrial.jpg" alt="Curso Electricidad Industrial" class="course-image" />
+            <div class="pack-label">Curso en vivo</div>
+            <h3 class="pack-title">Electricidad industrial desde cero – Arranque de motores trifásicos</h3>
+            <ul class="course-list">
+              <li>Electricidad industrial desde cero, con enfoque práctico.</li>
+              <li>2 primeras sesiones: introducción a electricidad básica.</li>
+              <li>Luego: circuitos de mando y potencia, contactores, relés y protecciones.</li>
+            </ul>
+            <div class="course-meta">
+              Del 10 de enero al 01 de febrero de 2026 &mdash; S/80 (aprox. $35 USD)
+            </div>
+          </div>
+          <div class="actions">
+            <a class="btn-secondary" href="elec_ind.pdf" target="_blank" rel="noopener noreferrer">
+              Contenido del curso
+            </a>
+            <button class="btn-secondary btn-detalles" data-detalle-id="detalle-curso-electricidad">
+              Ver detalles
+            </button>
+            <a class="btn-whatsapp" href="https://wa.link/f0mwik" target="_blank" rel="noopener noreferrer">
+              <img src="whatsapp.png" alt="WhatsApp" class="btn-whatsapp-icon">
+              <span>COMPRAR AHORA</span>
+            </a>
+          </div>
+        </article>
+
+        <!-- CURSO 2: PLC LOGO -->
+        <article class="card">
+          <div>
+            <img src="curso_logo8.jpg" alt="Curso PLC LOGO V8" class="course-image" />
+            <div class="pack-label">Curso en vivo</div>
+            <h3 class="pack-title">PLC LOGO! V8 – Introducción a la automatización</h3>
+            <ul class="course-list">
+              <li>Programación básica en LOGO Soft Comfort.</li>
+              <li>Temporizadores, contadores y señales analógicas.</li>
+              <li>Simulación de arranque de motor y procesos básicos.</li>
+            </ul>
+            <div class="course-meta">
+              Próxima fecha: por definir &mdash; Precio: por definir
+            </div>
+          </div>
+          <div class="actions">
+            <a class="btn-secondary" href="logo8.pdf" target="_blank" rel="noopener noreferrer">
+              Contenido del curso
+            </a>
+            <button class="btn-secondary btn-detalles" data-detalle-id="detalle-curso-logo">
+              Ver detalles
+            </button>
+            <a class="btn-whatsapp" href="#" target="_blank" rel="noopener noreferrer">
+              <img src="whatsapp.png" alt="WhatsApp" class="btn-whatsapp-icon">
+              <span>COMPRAR AHORA</span>
+            </a>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ===================== APPS: LOGICSOFT + CALCMOTOR ===================== -->
+    <section id="logicsoft">
+      <h2>Apps didácticas</h2>
+
+      <div class="section-intro" style="margin-bottom:1.3rem;">
+        Herramientas pensadas para que practiques circuitos con compuertas logicas y dimensionamiento de arranques de motores
+        trifásicos desde tu celular, laptop o PC.
+      </div>
+
+      <div class="logicsoft-simple">
+        <!-- Slider de imágenes de LOGICSOFT -->
+        <div class="logicsoft-slider">
+          <div class="slider-track">
+            <img src="img/logi1.jpg" alt="Captura Logicsoft 1">
+            <img src="img/logi2.jpg" alt="Captura Logicsoft 2">
+            <img src="img/logi3.jpg" alt="Captura Logicsoft 3">
+            <img src="img/logi4.jpg" alt="Captura Logicsoft 4">
+            <img src="img/logi5.jpg" alt="Captura Logicsoft 5">
+            <img src="img/logi6.jpg" alt="Captura Logicsoft 6">
+            <img src="img/logi7.jpg" alt="Captura Logicsoft 7">
+            <img src="img/logi8.jpg" alt="Captura Logicsoft 8">
+          </div>
+          <button class="slider-arrow slider-prev" type="button" aria-label="Anterior">‹</button>
+          <button class="slider-arrow slider-next" type="button" aria-label="Siguiente">›</button>
+        </div>
+
+        <!-- Caja de compra LOGICSOFT -->
+        <div class="logicsoft-box">
+          <h3 style="margin-bottom:0.6rem;">LOGICSOFT</h3>
+          <p style="font-size:0.95rem; color:var(--text-muted); margin-bottom:0.7rem;">
+            Una app didáctica para estudiantes y profesionales que permite simular
+            compuertas lógicas y temporizadores TON, TOFF y SR en tu celular, laptop o PC.
+          </p>
+
+          <p style="font-size:0.9rem; color:var(--text-muted);">
+            Elige tu tipo de suscripción:
+          </p>
+
+          <div class="logicsoft-options">
+            <label class="logicsoft-option-item">
+              <input type="radio" name="logicsoft-plan" id="logicsoft-mensual" value="mensual" checked>
+              <span>Opción 1: Mensual &mdash; S/5 (≈ $3 USD)</span>
+            </label>
+            <label class="logicsoft-option-item">
+              <input type="radio" name="logicsoft-plan" id="logicsoft-anual" value="anual">
+              <span>Opción 2: Anual &mdash; S/20 (≈ $8 USD)</span>
+            </label>
+          </div>
+
+          <button class="btn-whatsapp" id="btn-logicsoft-comprar" type="button" style="margin-top:0.75rem;">
+            <img src="whatsapp.png" alt="WhatsApp" class="btn-whatsapp-icon">
+            <span>COMPRAR AHORA</span>
+          </button>
+
+          <a class="btn-secondary" href="#" target="_blank" rel="noopener noreferrer" style="margin-top:0.6rem;">
+            Ver tutorial de LOGICSOFT
+          </a>
+        </div>
+      </div>
+
+      <!-- Caja de CalcMotor con slider vertical -->
+      <div class="logicsoft-box" style="margin-top:1.7rem;">
+        <h3 style="margin-bottom:0.4rem;">CalcMotor</h3>
+        <p style="font-size:0.95rem; color:var(--text-muted); margin-bottom:0.6rem;">
+          CalcMotor es una app que te ayuda a dimensionar los dispositivos empleados
+          en el arranque de un motor trifásico, como el contactor, el interruptor termomagnético (ITM)
+          y el relé térmico, de forma rápida y didáctica.
+        </p>
+
+        <!-- Slider vertical de CalcMotor -->
+        <div class="calcmotor-slider">
+          <div class="cal-slider-track">
+            <img src="img/cal1.jpg" alt="CalcMotor pantalla 1">
+            <img src="img/cal2.jpg" alt="CalcMotor pantalla 2">
+            <img src="img/cal3.jpg" alt="CalcMotor pantalla 3">
+            <img src="img/cal4.jpg" alt="CalcMotor pantalla 4">
+          </div>
+        </div>
+
+        <ul style="font-size:0.9rem; color:var(--text-soft); margin-left:0; list-style:none; margin-bottom:0.6rem; margin-top:0.7rem;">
+          <li style="position:relative; padding-left:1.1rem; margin-bottom:0.2rem;">
+            <span style="position:absolute; left:0; color:var(--accent-soft);">•</span>
+            Ingresas datos básicos del motor (potencia, tensión, tipo de conexión).
+          </li>
+          <li style="position:relative; padding-left:1.1rem; margin-bottom:0.2rem;">
+            <span style="position:absolute; left:0; color:var(--accent-soft);">•</span>
+            Te sugiere el rango de corriente y modelo de contactor recomendado.
+          </li>
+          <li style="position:relative; padding-left:1.1rem; margin-bottom:0.2rem;">
+            <span style="position:absolute; left:0; color:var(--accent-soft);">•</span>
+            Te orienta en la selección del ITM adecuado para protección.
+          </li>
+          <li style="position:relative; padding-left:1.1rem; margin-bottom:0.2rem;">
+            <span style="position:absolute; left:0; color:var(--accent-soft);">•</span>
+            Sugiere el rango de regulación del relé térmico acorde a la corriente del motor.
+          </li>
+        </ul>
+
+        <p style="font-size:0.92rem; margin-top:0.4rem;">
+          <strong>Disponible GRATIS</strong> para todos los estudiantes que compren
+          cualquiera de los packs de manuales (Pack 1, Pack 2, Pack 3 o Pack 4).
+        </p>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer>
+    &copy; 2025 – PASIR / Elwin Pachas. Todos los derechos reservados.
+  </footer>
+
+  <!-- ============ TEMPLATES DE DETALLE (OCULTOS) ============ -->
+  <div style="display:none;">
+    <!-- Detalle Pack 1 -->
+    <div id="detalle-pack1">
+      <h3>Mega Pack Industrial (Pack 1)</h3>
+      <p>Incluye todo para que tengas una biblioteca completa y muchas horas de contenido.</p>
+      <ul>
+        <li>Más de 100 manuales en PDF de:
+          <ul>
+            <li>Electricidad industrial.</li>
+            <li>Neumática / Hidráulica.</li>
+            <li>Automatización industrial.</li>
+            <li>Electricidad domiciliaria, domótica, etc.</li>
+          </ul>
+        </li>
+        <li>Clases grabadas de cursos anteriores (lógica cableada, PLC LOGO básico, electroneumática básica.).</li>
+        <li>Acceso al grupo privado de WhatsApp para consultas, avisos y material extra.</li>
+        <li>Ideal para quien quiere tener TODO el contenido de una sola vez.</li>
+      </ul>
+      <p><strong>Precio: S/49 &mdash; $18 USD</strong></p>
+    </div>
+
+        <!-- Detalle Pack 2 -->
+    <div id="detalle-pack2">
+      <h3>Pack 2 – Manuales + clases grabadas de cursos anteriores</h3>
+      <p>Incluye manuales completos y accseo al grupo privado de WhatsApp.</p>
+
+      <ul>
+        <li>Más de 100 manuales en PDF de:
+          <ul>
+            <li>Electricidad industrial.</li>
+            <li>Neumática / Hidráulica.</li>
+            <li>Automatización industrial.</li>
+            <li>Electricidad domiciliaria, domótica, etc.</li>
+          </ul>
+        </li>
+
+        <li>Clases grabadas de cursos anteriores:
+          <ul>
+            <li>Lógica cableada desde cero.</li>
+            <li>PLC LOGO básico.</li>
+            <li>Electroneumática básica con FluidSIM.</li>
+          </ul>
+        </li>
+
+        <li>Acceso al grupo privado de WhatsApp para consultas, avisos y material extra.</li>
+        <li>App CalcMotor, calculadorara para dimensionar dispositivos de arranque en motor trifásico.</li>
+
+        <li>Ideal si quieres estudiar con muchos manuales y las clases grabadas.</li>
+      </ul>
+
+      <p><strong>Precio: S/39 — $15 USD</strong></p>
+    </div>
+
+    <!-- Detalle Pack 3 -->
+    <div id="detalle-pack3">
+      <h3>Pack 3 – Solo Manuales (+100)</h3>
+      <p>Ideal si quieres armar tu biblioteca personal de consulta con muchos manuales.</p>
+
+      <ul>
+        <li>Acceso a más de <strong>100 manuales en PDF</strong> organizados por áreas:
+          <ul>
+            <li>Electricidad industrial.</li>
+            <li>Neumática / Hidráulica.</li>
+            <li>Automatización industrial.</li>
+            <li>Electricidad domiciliaria, domótica, etc.</li>
+          </ul>
+        </li>
+
+        <li>No incluye cursos grabados, solo material en PDF para estudio autónomo.</li>
+        <li>App CalcMotor, calculadorara para dimensionar dispositivos de arranque en motor trifásico.</li>
+        <li>Recomendado para quienes ya tienen algo de base y quieren reforzar teoría y práctica con lecturas.</li>
+      </ul>
+
+      <p><strong>Precio: S/29 — $10 USD</strong></p>
+    </div>
+
+    <!-- Detalle Pack 4 -->
+    <div id="detalle-pack4">
+      <h3>Pack 4 – Manuales por área</h3>
+      <p>Para quien solo necesita manuales de un tema específico.</p>
+
+      <ul>
+        <li>Elige una de estas áreas y recibes los manuales solo de esa categoría:
+          <ul>
+            <li><strong>Electricidad industrial</strong>.</li>
+            <li><strong>Neumática / Hidráulica</strong>.</li>
+            <li><strong>Automatización industrial</strong>.</li>
+            <li><strong>Electricidad domiciliaria y domótica</strong>.</li>
+          </ul>
+        </li>
+
+        <li>Cada área incluye varios manuales seleccionados de esa temática.</li>
+
+        <li>App CalcMotor, calculadorara para dimensionar dispositivos de arranque en motor trifásico.</li>
+
+        <li>No incluye cursos grabados, solo manuales en PDF del área elegida.</li>
+
+        <li>Ideal si quieres enfocarte en una sola especialidad sin comprar todo el contenido.</li>
+      </ul>
+
+      <p><strong>Precio: S/15 — $7 USD</strong></p>
+    </div>
+
+
+    <!-- Detalle Curso Electricidad Industrial (ACTUALIZADO) -->
+    <div id="detalle-curso-electricidad">
+      <h3>Curso en vivo: Electricidad Industrial desde cero</h3>
+      <p>
+        Curso virtual orientado a que aprendas desde la base de la electricidad hasta los circuitos típicos de
+        arranque de motores trifásicos en un entorno industrial.
+      </p>
+
+      <ul>
+        <li><strong>Fechas:</strong> del 10 de enero al 01 de febrero de 2026.</li>
+        <li><strong>Días de clase:</strong> sábados y domingos.</li>
+        <li><strong>Horario:</strong> 8:00 p.m. a 10:00 p.m. (hora Perú).</li>
+        <li><strong>Plataforma:</strong> Zoom (clases en vivo, con interacción y resolución de dudas).</li>
+        <li><strong>Total:</strong> 7 días de clase.</li>
+      </ul>
+
+      <p><strong>Enfoque del curso:</strong></p>
+      <ul>
+        <li><strong>2 primeras sesiones:</strong> Introducción a la electricidad básica
+          (conceptos fundamentales, seguridad eléctrica, uso correcto de instrumentos de medición).</li>
+        <li><strong>Sesiones siguientes:</strong> Electricidad industrial aplicada:
+          circuitos de mando y potencia, contactores, relé térmico, pulsadores, simbología y lectura de esquemas.</li>
+        <li>Arranque de motores trifásicos: arranque directo, inversión de giro y análisis de protecciones.</li>
+      </ul>
+
+      <p><strong>Requisitos:</strong></p>
+      <ul>
+        <li>No se requiere experiencia previa en electricidad.</li>
+        <li>Tener muchas ganas de aprender y practicar.</li>
+      </ul>
+
+      <p><strong>Dirigido a:</strong></p>
+      <ul>
+        <li>Personas que quieren iniciarse en electricidad industrial desde cero.</li>
+        <li>Estudiantes de carreras técnicas o universitarias.</li>
+        <li>Técnicos, ayudantes y aficionados que desean reforzar su base y entender mejor los tableros de control.</li>
+      </ul>
+
+      <p><strong>Inversión: S/80 &mdash; aprox. $35 USD</strong></p>
+    </div>
+
+    <!-- Detalle Curso PLC LOGO -->
+    <div id="detalle-curso-logo">
+      <h3>Curso en vivo: PLC LOGO! V8 – Introducción a la Automatización</h3>
+      <p>El siguiente nivel después de la electricidad industrial, llevando tus arranques a PLC.</p>
+      <ul>
+        <li>Programación básica en LOGO Soft Comfort desde cero.</li>
+        <li>Bloques lógicos, temporizadores, contadores y señales analógicas.</li>
+        <li>Ejemplos de arranque de motor, control de niveles, conteo de piezas, etc.</li>
+        <li>Simulación de proyectos en software (y posible integración con Factory IO).</li>
+      </ul>
+      <p><strong>Próxima fecha y precio: por definir.</strong></p>
+    </div>
+
+    <!-- Detalle LOGICSOFT -->
+    <div id="detalle-logicsoft">
+      <h3>App LOGICSOFT – Simulador de Lógica Cableada y Compuertas</h3>
+      <p>Herramienta didáctica para practicar desde el celular o PC, ideal para estudiantes y técnicos.</p>
+      <ul>
+        <li>Simulación de compuertas lógicas (AND, OR, NOT, etc.).</li>
+        <li>Bloques de control industrial: temporizadores TON, TOFF y biestable SR.</li>
+        <li>Permite armar esquemas de arranque directo e inversión de giro.</li>
+        <li>Interfaz amigable para usar en clases, prácticas y demostraciones en vivo.</li>
+      </ul>
+      <p><strong>Opción 1: Mensual S/5 — $3 USD<br>Opción 2: Anual S/20 — $8 USD</strong></p>
+    </div>
+  </div>
+
+  <!-- ============ MODAL & SCRIPT ============ -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title" id="modal-title">Detalles</div>
+        <button class="modal-close" id="modal-close" aria-label="Cerrar">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const backdrop = document.getElementById('modal-backdrop');
+      const modalTitle = document.getElementById('modal-title');
+      const modalBody = document.getElementById('modal-body');
+      const modalClose = document.getElementById('modal-close');
+
+      function abrirModal(desdeId) {
+        const template = document.getElementById(desdeId);
+        if (!template) return;
+        const tempDiv = template.cloneNode(true);
+        const h3 = tempDiv.querySelector('h3');
+        if (h3) {
+          modalTitle.textContent = h3.textContent;
+          h3.remove();
+        } else {
+          modalTitle.textContent = 'Detalles';
+        }
+        modalBody.innerHTML = tempDiv.innerHTML;
+        backdrop.style.display = 'flex';
+      }
+
+      function cerrarModal() {
+        backdrop.style.display = 'none';
+      }
+
+      document.querySelectorAll('.btn-detalles').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-detalle-id');
+          if (id) abrirModal(id);
+        });
+      });
+
+      modalClose.addEventListener('click', cerrarModal);
+      backdrop.addEventListener('click', (e) => {
+        if (e.target === backdrop) cerrarModal();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') cerrarModal();
+      });
+
+      // Lógica del botón COMPRAR AHORA de LOGICSOFT
+      const btnLogicsoftComprar = document.getElementById('btn-logicsoft-comprar');
+      if (btnLogicsoftComprar) {
+        btnLogicsoftComprar.addEventListener('click', function () {
+          const mensual = document.getElementById('logicsoft-mensual');
+          const anual = document.getElementById('logicsoft-anual');
+
+          let url = '';
+          if (mensual && mensual.checked) {
+            url = 'https://wa.link/ldnvjy'; // mensual
+          } else if (anual && anual.checked) {
+            url = 'https://wa.link/yprp9x'; // anual
+          } else {
+            url = 'https://wa.link/ldnvjy'; // por defecto mensual
+          }
+
+          window.open(url, '_blank');
+        });
+      }
+
+      // Tema claro/oscuro con localStorage
+      const themeToggle = document.getElementById('theme-toggle');
+      const themeIcon = document.getElementById('theme-icon');
+      const themeLabel = document.getElementById('theme-label');
+      const themeMeta = document.getElementById('theme-color-meta');
+
+      function aplicarTema(theme) {
+        document.body.setAttribute('data-theme', theme);
+        const oscuro = theme === 'dark';
+        themeIcon.textContent = oscuro ? '🌙' : '☀️';
+        themeLabel.textContent = oscuro ? 'Modo oscuro' : 'Modo claro';
+        themeMeta.setAttribute('content', oscuro ? '#0b1220' : '#f3f4f6');
+      }
+
+      const temaGuardado = localStorage.getItem('pasir-theme');
+      if (temaGuardado === 'light' || temaGuardado === 'dark') {
+        aplicarTema(temaGuardado);
+      } else {
+        aplicarTema('light'); // por defecto claro
+      }
+
+      themeToggle.addEventListener('click', () => {
+        const actual = document.body.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+        const nuevo = actual === 'light' ? 'dark' : 'light';
+        aplicarTema(nuevo);
+        localStorage.setItem('pasir-theme', nuevo);
+      });
+
+      // ===== SLIDER LOGICSOFT (AUTO + MANUAL) =====
+      const sliderTrack = document.querySelector('.logicsoft-slider .slider-track');
+      const slides = sliderTrack ? sliderTrack.querySelectorAll('img') : [];
+      const prevBtn = document.querySelector('.slider-prev');
+      const nextBtn = document.querySelector('.slider-next');
+      let currentSlide = 0;
+      let sliderInterval = null;
+      const delay = 3000; // 3 segundos
+
+      function showSlide(index) {
+        if (!slides.length) return;
+        const total = slides.length;
+        currentSlide = (index + total) % total;
+        sliderTrack.style.transform = 'translateX(-' + (currentSlide * 100) + '%)';
+      }
+
+      function startAuto() {
+        if (sliderInterval) clearInterval(sliderInterval);
+        sliderInterval = setInterval(() => {
+          showSlide(currentSlide + 1);
+        }, delay);
+      }
+
+      if (slides.length && sliderTrack) {
+        showSlide(0);
+        startAuto();
+
+        if (prevBtn) {
+          prevBtn.addEventListener('click', () => {
+            showSlide(currentSlide - 1);
+            startAuto(); // reinicia auto después de interacción
+          });
+        }
+
+        if (nextBtn) {
+          nextBtn.addEventListener('click', () => {
+            showSlide(currentSlide + 1);
+            startAuto(); // reinicia auto después de interacción
+          });
+        }
+      }
+
+      // ===== SLIDER CALCMOTOR (AUTO, 6s) =====
+      const calTrack = document.querySelector('.calcmotor-slider .cal-slider-track');
+      const calSlides = calTrack ? calTrack.querySelectorAll('img') : [];
+      let calIndex = 0;
+      let calInterval = null;
+      const calDelay = 3000; // 3 segundos
+
+      function showCalSlide(index) {
+        if (!calSlides.length) return;
+        const total = calSlides.length;
+        calIndex = (index + total) % total;
+        calTrack.style.transform = 'translateX(-' + (calIndex * 100) + '%)';
+      }
+
+      function startCalAuto() {
+        if (calInterval) clearInterval(calInterval);
+        calInterval = setInterval(() => {
+          showCalSlide(calIndex + 1);
+        }, calDelay);
+      }
+
+      if (calSlides.length && calTrack) {
+        showCalSlide(0);
+        startCalAuto();
+      }
+
+      // Registro del Service Worker (PWA)
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('./sw.js').catch(err => {
+            console.log('SW registration failed:', err);
+          });
+        });
+      }
+    });
+  </script>
+</body>
+</html>
