@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Curso</title>
+  <style>
+    body{font-family:system-ui;margin:0;background:#0b1220;color:#f9fafb}
+    header{padding:14px 16px;border-bottom:1px solid rgba(148,163,184,.25);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+    .muted{color:#9ca3af}
+    .wrap{display:grid;grid-template-columns:320px 1fr;min-height:calc(100vh - 62px)}
+    aside{border-right:1px solid rgba(148,163,184,.25);padding:12px;overflow:auto}
+    main{padding:12px}
+    .mod{width:100%;text-align:left;padding:10px 12px;margin:6px 0;border-radius:12px;
+         border:1px solid rgba(148,163,184,.25);background:rgba(148,163,184,.08);color:#f9fafb;cursor:pointer}
+    .mod.active{border-color:rgba(56,189,248,.7);background:rgba(56,189,248,.12)}
+    .player{position:relative;padding-top:56.25%;border-radius:16px;overflow:hidden;border:1px solid rgba(148,163,184,.25);background:rgba(148,163,184,.06)}
+    iframe{position:absolute;inset:0;width:100%;height:100%}
+    .topbtn{display:inline-block;padding:10px 12px;border-radius:12px;text-decoration:none;font-weight:900}
+    .secondary{background:rgba(56,189,248,.18);color:#f9fafb;border:1px solid rgba(56,189,248,.35)}
+    .primary{background:#22c55e;color:#071018;border:0;cursor:pointer}
+    .err{color:#fca5a5;font-weight:800;white-space:pre-wrap}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div id="courseTitle" style="font-weight:1000">Cargando…</div>
+      <div id="nowPlaying" class="muted"></div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:center">
+      <a class="topbtn secondary" href="account.html">⬅ Mis cursos</a>
+      <button id="logout" class="topbtn primary">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <div class="wrap">
+    <aside>
+      <div style="font-weight:1000;margin:6px 0 10px">Módulos</div>
+      <div id="modules"></div>
+      <div id="msg" class="err" style="margin-top:10px"></div>
+    </aside>
+
+    <main>
+      <div class="player">
+        <iframe id="player" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div class="muted" style="margin-top:10px">
+        Si el video no carga, revisa que sea <b>Público</b> o <b>No listado</b> en YouTube.
+      </div>
+    </main>
+  </div>
+
+<script>
+  const API_URL = 'https://script.google.com/macros/s/AKfycbxDqkSFvg7n7dxRkSk3w0x842bSW3aoODvTVlLoCyM4AJYFOhCmiOpG6ILv6uBlL-kgHg/exec';
+
+  function jsonp(action, payload) {
+    return new Promise((resolve, reject) => {
+      const cb = "cb_" + Math.random().toString(36).slice(2);
+      const params = new URLSearchParams();
+      params.set("action", action);
+      Object.entries(payload || {}).forEach(([k,v]) => {
+        if (v === undefined || v === null) return;
+        params.set(k, String(v));
+      });
+      params.set("callback", cb);
+
+      const script = document.createElement("script");
+      script.src = API_URL + "?" + params.toString();
+      script.async = true;
+
+      window[cb] = (data) => {
+        cleanup();
+        resolve(data);
+      };
+
+      function cleanup() {
+        try { delete window[cb]; } catch(e) { window[cb] = undefined; }
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+
+      script.onerror = () => {
+        cleanup();
+        reject(new Error("No se pudo conectar (JSONP)."));
+      };
+
+      document.body.appendChild(script);
+    });
+  }
+
+  const token = sessionStorage.getItem("pasir_token");
+  if (!token) location.href = "login.html";
+
+  const params = new URLSearchParams(location.search);
+  const courseId = params.get("courseId");
+
+  document.getElementById("logout").onclick = () => {
+    sessionStorage.removeItem("pasir_token");
+    location.href = "index.html";
+  };
+
+  function setActive(btn) {
+    document.querySelectorAll(".mod").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+  }
+
+  function showError(text) {
+    document.getElementById("msg").textContent = text || "";
+  }
+
+  (async () => {
+    if (!courseId) {
+      showError("Falta courseId en la URL. Ej: course.html?courseId=logo8-basico");
+      return;
+    }
+
+    const r = await jsonp("course", { token, courseId });
+    if (!r.ok) {
+      showError(r.error || "No se pudo cargar el curso.");
+      if ((r.error || "").toLowerCase().includes("no autorizado")) {
+        setTimeout(()=> location.href="account.html", 800);
+      }
+      return;
+    }
+
+    document.getElementById("courseTitle").textContent = r.course.title || courseId;
+
+    const box = document.getElementById("modules");
+    box.innerHTML = "";
+    showError("");
+
+    r.modules.forEach((m, idx) => {
+      const b = document.createElement("button");
+      b.className = "mod";
+      b.textContent = `${m.order}. ${m.title}`;
+      b.onclick = () => {
+        setActive(b);
+        document.getElementById("player").src = m.embedUrl;
+        document.getElementById("nowPlaying").textContent = "Reproduciendo: " + m.title;
+      };
+      box.appendChild(b);
+      if (idx === 0) b.click();
+    });
+  })().catch(err => {
+    showError(err.message || String(err));
+  });
+</script>
+</body>
+</html>
