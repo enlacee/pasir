@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Curso</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --panel:rgba(255,255,255,.06);
+      --panel2:rgba(255,255,255,.04);
+      --stroke:rgba(148,163,184,.22);
+      --text:#f9fafb;
+      --muted:rgba(255,255,255,.70);
+      --green:#22c55e;
+      --blue:#38bdf8;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui;background:var(--bg);color:var(--text)}
+    a{color:inherit}
+
+    /* Header */
+    header{
+      position:sticky;top:0;z-index:20;
+      padding:14px 16px;
+      border-bottom:1px solid var(--stroke);
+      background:linear-gradient(180deg, rgba(11,18,32,.96), rgba(11,18,32,.86));
+      backdrop-filter: blur(8px);
+      display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+    }
+    #courseTitle{font-weight:1000}
+    .muted{color:var(--muted)}
+
+    .top-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+    .topbtn{
+      display:inline-flex;align-items:center;gap:8px;
+      padding:10px 12px;border-radius:12px;text-decoration:none;font-weight:900;
+      border:1px solid transparent;
+    }
+    .secondary{background:rgba(56,189,248,.18);border-color:rgba(56,189,248,.35)}
+    .primary{background:var(--green);color:#071018;border:0;cursor:pointer}
+
+    /* Layout like Udemy mobile: player arriba + módulos abajo */
+    .container{max-width:1080px;margin:0 auto;padding:14px 14px 28px}
+    .player-wrap{
+      border:1px solid var(--stroke);
+      border-radius:18px;
+      overflow:hidden;
+      background:var(--panel2);
+      box-shadow:0 18px 40px rgba(0,0,0,.35);
+    }
+    .player{
+      position:relative;
+      width:100%;
+      padding-top:56.25%;
+      background:rgba(0,0,0,.25);
+    }
+    iframe{position:absolute;inset:0;width:100%;height:100%}
+
+    .player-meta{
+      display:flex;justify-content:space-between;align-items:flex-start;gap:10px;
+      padding:12px 12px 12px;
+      border-top:1px solid var(--stroke);
+    }
+    .player-meta .left{min-width:0}
+    .player-meta .left .now{font-weight:900}
+    .player-meta .left .hint{font-size:12px;color:var(--muted);margin-top:4px}
+    .player-meta .right{display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .smallbtn{
+      padding:10px 12px;border-radius:12px;
+      border:1px solid var(--stroke);
+      background:rgba(255,255,255,.06);
+      text-decoration:none;font-weight:900;
+    }
+    .smallbtn:hover{border-color:rgba(255,255,255,.28)}
+
+    /* Curriculum */
+    .curriculum{
+      margin-top:14px;
+      border:1px solid var(--stroke);
+      border-radius:18px;
+      overflow:hidden;
+      background:var(--panel2);
+    }
+    .curriculum-h{
+      padding:14px 14px;
+      display:flex;justify-content:space-between;align-items:center;gap:12px;
+      border-bottom:1px solid var(--stroke);
+      background:rgba(255,255,255,.03);
+    }
+    .curriculum-h h2{margin:0;font-size:16px;letter-spacing:.2px}
+    .curriculum-h .sub{font-size:12px;color:var(--muted)}
+
+    #modules{display:flex;flex-direction:column}
+
+    /* Udemy-like rows */
+    .mod{
+      width:100%;
+      text-align:left;
+      display:flex;gap:12px;align-items:center;
+      padding:12px 14px;
+      border:0;
+      background:transparent;
+      color:inherit;
+      cursor:pointer;
+      border-bottom:1px solid rgba(148,163,184,.18);
+    }
+    .mod:last-child{border-bottom:0}
+    .mod:hover{background:rgba(255,255,255,.04)}
+    .mod.active{background:rgba(34,197,94,.10)}
+    .mod .thumb{
+      width:84px;aspect-ratio:16/9;border-radius:12px;overflow:hidden;
+      background:rgba(0,0,0,.35);flex:0 0 auto;
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .mod .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+    .mod .info{min-width:0;flex:1}
+    .mod .info .t{margin:0;font-weight:900;font-size:14px;line-height:1.2}
+    .mod .info .s{margin:6px 0 0;font-size:12px;color:var(--muted)}
+    .mod .meta{
+      flex:0 0 auto;
+      display:flex;align-items:center;gap:8px;
+      color:rgba(255,255,255,.85);
+      font-weight:900;
+      font-size:12px;
+    }
+    .pill{
+      padding:6px 10px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      white-space:nowrap;
+    }
+
+    .err{color:#fca5a5;font-weight:800;white-space:pre-wrap;padding:12px 14px}
+
+    /* Responsive refinements */
+    @media (max-width: 520px){
+      header{padding:12px 12px}
+      .container{padding:12px 12px 24px}
+      .mod .thumb{width:74px}
+      .mod .meta{display:none}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <div id="courseTitle">Cargando…</div>
+      <div id="nowPlaying" class="muted"></div>
+    </div>
+    <div class="top-actions">
+      <a class="topbtn secondary" href="account.html">⬅ Mis cursos</a>
+      <button id="logout" class="topbtn primary">Cerrar sesión</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <section class="player-wrap" aria-label="Reproductor">
+      <div class="player">
+        <iframe id="player" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+      <div class="player-meta">
+        <div class="left">
+          <div class="now" id="nowTitle">Reproduciendo</div>
+          <div class="hint">
+            Si el video no carga, revisa que sea <b>Público</b> o <b>No listado</b> en YouTube.
+          </div>
+        </div>
+        <div class="right">
+          <a class="smallbtn" id="openYT" href="#" target="_blank" rel="noopener">Mirar en YouTube</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="curriculum" aria-label="Módulos">
+      <div class="curriculum-h">
+        <div>
+          <h2>Módulos</h2>
+          <div class="sub">Selecciona una clase para reproducir</div>
+        </div>
+        <div class="sub" id="countMods"></div>
+      </div>
+
+      <div id="modules"></div>
+      <div id="msg" class="err"></div>
+    </section>
+  </div>
+
+  <script>
+function escapeHtml_(s){
+  return String(s||"").replace(/[&<>"']/g,(c)=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[c]));
+}
+
+  const API_URL = "https://pasir-proxy.vercel.app/api";
+
+  function jsonp(action, payload) {
+    return new Promise((resolve, reject) => {
+      const cb = "cb_" + Math.random().toString(36).slice(2);
+      const params = new URLSearchParams();
+      params.set("action", action);
+      Object.entries(payload || {}).forEach(([k,v]) => {
+        if (v === undefined || v === null) return;
+        params.set(k, String(v));
+      });
+      params.set("callback", cb);
+
+      const script = document.createElement("script");
+      script.src = API_URL + "?" + params.toString();
+      script.async = true;
+
+      window[cb] = (data) => {
+        cleanup();
+        resolve(data);
+      };
+
+      function cleanup() {
+        try { delete window[cb]; } catch(e) { window[cb] = undefined; }
+        if (script.parentNode) script.parentNode.removeChild(script);
+      }
+
+      script.onerror = () => {
+        cleanup();
+        reject(new Error("No se pudo conectar (JSONP)."));
+      };
+
+      document.body.appendChild(script);
+    });
+  }
+
+  const token = sessionStorage.getItem("pasir_token");
+  if (!token) location.href = "login.html";
+
+  const params = new URLSearchParams(location.search);
+  const courseId = params.get("courseId");
+
+  document.getElementById("logout").onclick = () => {
+    sessionStorage.removeItem("pasir_token");
+    location.href = "index.html";
+  };
+
+  function setActive(btn) {
+    document.querySelectorAll(".mod").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+  }
+
+  function showError(text) {
+    document.getElementById("msg").textContent = text || "";
+  }
+
+  (async () => {
+    if (!courseId) {
+      showError("Falta courseId en la URL. Ej: course.html?courseId=logo8-basico");
+      return;
+    }
+
+    const r = await jsonp("course", { token, courseId });
+    if (!r.ok) {
+      showError(r.error || "No se pudo cargar el curso.");
+      if ((r.error || "").toLowerCase().includes("no autorizado")) {
+        setTimeout(()=> location.href="account.html", 800);
+      }
+      return;
+    }
+
+    document.getElementById("courseTitle").textContent = r.course.title || courseId;
+
+    const box = document.getElementById("modules");
+    box.innerHTML = "";
+    showError("");
+
+    document.getElementById("countMods").textContent = (r.modules?.length||0) + " clases";
+    r.modules.forEach((m, idx) => {
+      const b = document.createElement("button");
+      b.className = "mod";
+      const videoId = (m.videoId) || (m.embedUrl || "").split("/embed/")[1]?.split("?")[0] || "";
+      const thumb = videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : "icons/icon-192.png";
+      b.innerHTML = `
+        <div class="thumb"><img src="${thumb}" alt=""></div>
+        <div class="info">
+          <p class="t">${escapeHtml_(`${m.order}. ${m.title}`)}</p>
+          <p class="s">Toca para reproducir</p>
+        </div>
+      `;
+      b.onclick = () => {
+        setActive(b);
+        document.getElementById("player").src = m.embedUrl;
+        document.getElementById("nowPlaying").textContent = "Reproduciendo: " + m.title;
+        const nt = document.getElementById("nowTitle"); if (nt) nt.textContent = m.title;
+        const yt = document.getElementById("openYT");
+        if (yt) {
+          const vid = (m.videoId) || (m.embedUrl || "").split("/embed/")[1]?.split("?")[0] || "";
+          yt.href = vid ? ("https://www.youtube.com/watch?v=" + vid) : "#";
+        }
+      };
+      box.appendChild(b);
+      if (idx === 0) b.click();
+    });
+  })().catch(err => {
+    showError(err.message || String(err));
+  });
+</script>
+
+  <script>
+  // PWA: registrar Service Worker
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./sw.js").catch(() => {});
+    });
+  }
+</script>
+</body>
+</html>
+
+</body>
+</html>
