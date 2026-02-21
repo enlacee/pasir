@@ -306,6 +306,14 @@ header > div:first-child { display:none !important; }
 .cc-select option{ color:#000; }
 </style>
 
+
+<style>
+/* Separar título del área de controles */
+.player-meta .left{
+  margin-top: 20px !important;
+}
+</style>
+
 </head>
 <body>
   <header>
@@ -353,7 +361,7 @@ header > div:first-child { display:none !important; }
   <input class="cc-seek" id="ccSeek" type="range" min="0" max="1000" value="0" aria-label="Línea de tiempo">
   <span class="cc-time" id="ccTime">0:00 / 0:00</span>
   <select class="cc-select" id="ccSpeed" aria-label="Velocidad"></select>
-  <select class="cc-select" id="ccQuality" aria-label="Calidad"></select>
+  
   <button class="cc-btn" id="ccFs" type="button" aria-label="Pantalla completa">⛶</button>
 </div>
 
@@ -429,67 +437,7 @@ function setupControls_(){
 
   
   const speedSel = document.getElementById("ccSpeed");
-  const qualSel = document.getElementById("ccQuality");
-
-  function labelQuality_(q){
-    const map = {
-      "highres":"High",
-      "hd2160":"4K",
-      "hd1440":"2K",
-      "hd1080":"1080p",
-      "hd720":"720p",
-      "large":"480p",
-      "medium":"360p",
-      "small":"240p",
-      "tiny":"144p",
-      "auto":"Auto"
-    };
-    return map[q] || q;
-  }
-
-  function fillSpeed_(){
-    if (!speedSel || !YTPlayer || !YTPlayer.getAvailablePlaybackRates) return;
-    const rates = YTPlayer.getAvailablePlaybackRates() || [1];
-    speedSel.innerHTML = "";
-    rates.forEach(r => {
-      const o = document.createElement("option");
-      o.value = String(r);
-      o.textContent = (r === 1 ? "1x" : (String(r) + "x"));
-      speedSel.appendChild(o);
-    });
-    try{
-      speedSel.value = String(YTPlayer.getPlaybackRate ? YTPlayer.getPlaybackRate() : 1);
-    }catch(e){ speedSel.value = "1"; }
-    speedSel.onchange = () => {
-      try{ YTPlayer.setPlaybackRate(parseFloat(speedSel.value)); }catch(e){}
-    };
-  }
-
-  function fillQuality_(){
-    if (!qualSel || !YTPlayer || !YTPlayer.getAvailableQualityLevels) return;
-    const levels = YTPlayer.getAvailableQualityLevels() || [];
-    // YouTube suele devolver niveles en orden descendente; agregamos Auto arriba
-    const opts = ["auto"].concat(levels);
-    qualSel.innerHTML = "";
-    opts.forEach(q => {
-      const o = document.createElement("option");
-      o.value = q;
-      o.textContent = labelQuality_(q);
-      qualSel.appendChild(o);
-    });
-    qualSel.value = "auto";
-    qualSel.onchange = () => {
-      try{
-        const v = qualSel.value;
-        if (v === "auto"){
-          // rango amplio para dejar que YouTube elija
-          if (YTPlayer.setPlaybackQualityRange) YTPlayer.setPlaybackQualityRange("highres","tiny");
-        } else {
-          if (YTPlayer.setPlaybackQuality) YTPlayer.setPlaybackQuality(v);
-          if (YTPlayer.setPlaybackQualityRange) YTPlayer.setPlaybackQualityRange(v,v);
-        }
-      }catch(e){}
-    };
+  
   }
 
 if (btn){
@@ -561,6 +509,7 @@ window.onYouTubeIframeAPIReady = function(){
     events: {
       onReady: () => {
         setupControls_();
+        try{ fillSpeed_(); }catch(e){}
         if (pendingVideoId){
           loadVideoById_(pendingVideoId, false);
           pendingVideoId = null;
