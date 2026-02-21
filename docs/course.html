@@ -240,6 +240,56 @@ header > div:first-child { display:none !important; }
 }
 </style>
 
+
+<style>
+/* ==== Bloquear interacción directa con el player (taps) y mostrar controles propios al tocar ==== */
+.player-wrap{ position:relative !important; }
+
+/* Cubre el área del video para que NO se puedan tocar los controles nativos */
+.tap-shield{
+  position:absolute;
+  left:0; top:0; right:0;
+  /* altura del área video (la parte superior de la card). Ajusta si cambia el layout */
+  height: calc(100% - 0px);
+  z-index: 50;
+  background: transparent;
+  pointer-events: auto;
+}
+
+/* Controles propios flotando sobre el video (abajo) */
+#ccWrap{
+  position:absolute !important;
+  left:12px; right:12px;
+  bottom:12px;
+  z-index: 60;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition: opacity .18s ease, transform .18s ease;
+}
+
+/* Estado visible */
+#ccWrap.is-visible{
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+/* En horizontal/fullscreen, que el overlay y controles sigan funcionando */
+.player-wrap:fullscreen #ccWrap,
+.player-wrap:-webkit-full-screen #ccWrap{
+  left:16px; right:16px; bottom:16px;
+}
+.player-wrap:fullscreen .tap-shield,
+.player-wrap:-webkit-full-screen .tap-shield{
+  left:0; top:0; right:0; bottom:0;
+  height: 100%;
+}
+
+/* Importante: que el tapShield NO cubra los controles */
+#ccWrap{ }
+</style>
+
 </head>
 <body>
   <header>
@@ -271,6 +321,9 @@ header > div:first-child { display:none !important; }
     <section class="player-wrap" aria-label="Reproductor">
       <div class="player">
         <div id="player" class="yt-player"></div>
+
+<div id="tapShield" class="tap-shield" aria-label="Zona protegida del video"></div>
+
       </div>
       <div class="player-meta">
         <div class="left">
@@ -650,6 +703,53 @@ function escapeHtml_(s){
       location.href = "index.html";
     });
   }
+})();
+</script>
+
+
+<script>
+/* ==== Mostrar controles propios al tocar el video (y bloquear toques al player nativo) ==== */
+(function(){
+  const shield = document.getElementById("tapShield");
+  const wrap = document.getElementById("ccWrap");
+  let hideTimer = null;
+
+  function showControls(){
+    if (!wrap) return;
+    wrap.classList.add("is-visible");
+    if (hideTimer) clearTimeout(hideTimer);
+    hideTimer = setTimeout(() => {
+      wrap.classList.remove("is-visible");
+    }, 3200);
+  }
+
+  // Tocar el video: solo muestra controles, NO deja interactuar con el iframe
+  if (shield){
+    shield.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      showControls();
+    }, {passive:false});
+
+    shield.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      showControls();
+    }, {passive:false});
+  }
+
+  // Si tocan el área de controles, no ocultar inmediatamente
+  if (wrap){
+    wrap.addEventListener("pointerdown", () => {
+      if (hideTimer) clearTimeout(hideTimer);
+    });
+    wrap.addEventListener("pointerup", () => {
+      showControls();
+    });
+  }
+
+  // Exponer para otros scripts si hace falta
+  window.__showCustomControls = showControls;
 })();
 </script>
 
