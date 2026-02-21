@@ -260,7 +260,7 @@ header > div:first-child { display:none !important; }
 #ccWrap{
   position:absolute !important;
   left:12px; right:12px;
-  bottom:12px;
+  bottom:28px;
   z-index: 60;
   opacity: 0;
   transform: translateY(8px);
@@ -278,7 +278,7 @@ header > div:first-child { display:none !important; }
 /* En horizontal/fullscreen, que el overlay y controles sigan funcionando */
 .player-wrap:fullscreen #ccWrap,
 .player-wrap:-webkit-full-screen #ccWrap{
-  left:16px; right:16px; bottom:16px;
+  left:16px; right:16px; bottom:28px;
 }
 .player-wrap:fullscreen .tap-shield,
 .player-wrap:-webkit-full-screen .tap-shield{
@@ -297,6 +297,12 @@ header > div:first-child { display:none !important; }
 
 /* Botón velocidad */
 .cc-speed{ width:56px !important; font-size:14px !important; }
+</style>
+
+
+<style>
+/* Subir controles un poco más arriba para no tapar título */
+#ccWrap{ bottom:28px !important; }
 </style>
 
 </head>
