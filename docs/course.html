@@ -199,6 +199,26 @@
     .dd-item.danger{color:#fecaca}
 
   </style>
+
+<style>
+/* Bloquea taps sobre botones del reproductor que llevan a YouTube (esquinas inferiores) */
+.video-wrap, .video-container, #playerWrap, #videoWrap, #videoContainer,
+.player-wrap, .player-container, .video-frame-wrap { position: relative; }
+
+/* Si tu contenedor es el clásico con padding-bottom, esto lo cubre también */
+.yt-blocker{
+  position:absolute;
+  bottom:10px;
+  height:64px;
+  width:150px;
+  z-index:9999;
+  pointer-events:auto;
+  background:transparent;
+}
+#ytBlockLeft{ left:10px; }
+#ytBlockRight{ right:10px; width:190px; }
+</style>
+
 </head>
 <body>
   <header>
@@ -230,6 +250,10 @@
     <section class="player-wrap" aria-label="Reproductor">
       <div class="player">
         <iframe id="player" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
+<div id="ytBlockLeft" class="yt-blocker" aria-hidden="true"></div>
+<div id="ytBlockRight" class="yt-blocker" aria-hidden="true"></div>
+
       </div>
       <div class="player-meta">
         <div class="left">
