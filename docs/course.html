@@ -314,6 +314,29 @@ header > div:first-child { display:none !important; }
 }
 </style>
 
+
+<style>
+/* ==== Ajuste v4: controles sobre el video, sin montar el título ==== */
+.player{ position:relative !important; }
+
+/* El escudo solo cubre el área del video */
+.tap-shield{ position:absolute; inset:0; z-index:50; }
+
+/* Controles flotantes dentro del video */
+#ccWrap{
+  position:absolute !important;
+  left:12px; right:12px;
+  bottom:12px;
+  z-index:60;
+}
+
+/* En fullscreen (del contenedor .player-wrap), mantener controles dentro del video */
+.player-wrap:fullscreen .player #ccWrap,
+.player-wrap:-webkit-full-screen .player #ccWrap{
+  left:16px; right:16px; bottom:16px;
+}
+</style>
+
 </head>
 <body>
   <header>
@@ -348,14 +371,6 @@ header > div:first-child { display:none !important; }
 
 <div id="tapShield" class="tap-shield" aria-label="Zona protegida del video"></div>
 
-      </div>
-      <div class="player-meta">
-        <div class="left">
-          <div class="now" id="nowTitle">Reproduciendo</div>
-          
-        </div>
-        <div class="right">
-
 <div class="cc-wrap" id="ccWrap" aria-label="Controles del video">
   <button class="cc-btn" id="ccPlay" type="button" aria-label="Reproducir / Pausar">▶</button>
   <input class="cc-seek" id="ccSeek" type="range" min="0" max="1000" value="0" aria-label="Línea de tiempo">
@@ -366,7 +381,17 @@ header > div:first-child { display:none !important; }
 </div>
 
 
-          <!-- Link externo oculto para mantener el reproductor limpio -->
+          
+
+      </div>
+      <div class="player-meta">
+        <div class="left">
+          <div class="now" id="nowTitle">Reproduciendo</div>
+          
+        </div>
+        <div class="right">
+
+<!-- Link externo oculto para mantener el reproductor limpio -->
           <a class="smallbtn" id="openYT" href="#" target="_blank" rel="noopener" style="display:none">Ver en YouTube</a>
         </div>
     </section>
@@ -509,8 +534,7 @@ window.onYouTubeIframeAPIReady = function(){
     events: {
       onReady: () => {
         setupControls_();
-        try{ fillSpeed_(); }catch(e){}
-        if (pendingVideoId){
+if (pendingVideoId){
           loadVideoById_(pendingVideoId, false);
           pendingVideoId = null;
         }
