@@ -199,6 +199,47 @@
     .dd-item.danger{color:#fecaca}
 
   </style>
+
+<style>
+/* ==== Ajustes solicitados: ocultar título y perfil (menú usuario) ==== */
+#courseTitle, #nowPlaying, #userMenu { display:none !important; }
+/* Mantén el header pero solo con "Mis cursos" */
+header > div:first-child { display:none !important; }
+</style>
+
+<style>#openYT{display:none !important;}</style>
+
+<style>
+/* ==== Player con API + controles propios ==== */
+.yt-player{
+  position:absolute; inset:0;
+  width:100%; height:100%;
+}
+/* Controles propios (funcionan en móvil) */
+.cc-wrap{
+  display:flex; gap:10px; align-items:center; flex-wrap:nowrap;
+}
+.cc-btn{
+  width:44px; height:38px;
+  border:0; border-radius:12px;
+  background:rgba(255,255,255,.10);
+  color:#fff; font-size:18px;
+}
+.cc-seek{ flex:1; min-width: 120px; }
+.cc-time{ font-variant-numeric: tabular-nums; opacity:.85; font-size: 13px; white-space: nowrap; }
+
+/* Pantalla completa: estira el contenedor del player */
+.player-wrap:fullscreen{
+  width:100vw; height:100vh;
+  max-width:none;
+  border-radius:0;
+}
+.player-wrap:fullscreen .player{
+  padding-top:0 !important;
+  height:100vh !important;
+}
+</style>
+
 </head>
 <body>
   <header>
@@ -230,13 +271,6 @@
     <section class="player-wrap" aria-label="Reproductor">
       <div class="player">
         <div id="player" class="yt-player"></div>
-
-<div id="ccWrap" class="cc-wrap" aria-label="Controles del video">
-  <button id="ccPlay" class="cc-btn" type="button" aria-label="Reproducir / Pausar">▶</button>
-  <input id="ccSeek" class="cc-seek" type="range" min="0" max="1000" value="0" aria-label="Barra de progreso">
-  <span id="ccTime" class="cc-time">0:00 / 0:00</span>
-</div>
-
       </div>
       <div class="player-meta">
         <div class="left">
@@ -246,6 +280,15 @@
           </div>
         </div>
         <div class="right">
+
+<div class="cc-wrap" id="ccWrap" aria-label="Controles del video">
+  <button class="cc-btn" id="ccPlay" type="button" aria-label="Reproducir / Pausar">▶</button>
+  <input class="cc-seek" id="ccSeek" type="range" min="0" max="1000" value="0" aria-label="Línea de tiempo">
+  <span class="cc-time" id="ccTime">0:00 / 0:00</span>
+  <button class="cc-btn" id="ccFs" type="button" aria-label="Pantalla completa">⛶</button>
+</div>
+
+
           <!-- Link externo oculto para mantener el reproductor limpio -->
           <a class="smallbtn" id="openYT" href="#" target="_blank" rel="noopener" style="display:none">Ver en YouTube</a>
         </div>
@@ -265,7 +308,144 @@
     </section>
   </div>
 
-  <script>
+  
+<script>
+/* ===== YouTube IFrame Player API (sin UI de YouTube) + controles propios ===== */
+let YTPlayer = null;
+let YTReady = false;
+let pendingVideoId = null;
+
+function fmtTime_(sec){
+  sec = Math.max(0, Math.floor(sec || 0));
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return m + ":" + String(s).padStart(2, "0");
+}
+
+function normalizeVideoId_(value){
+  if (!value) return "";
+  const v = String(value).trim();
+  if (/^[a-zA-Z0-9_-]{11}$/.test(v)) return v;
+  const m = v.match(/(?:youtu\.be\/|v=|\/embed\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : "";
+}
+
+function ensureYT_(){
+  if (document.getElementById("ytApiLoaded")) return;
+  const s = document.createElement("script");
+  s.id = "ytApiLoaded";
+  s.src = "https://www.youtube.com/iframe_api";
+  s.async = true;
+  document.head.appendChild(s);
+}
+
+function loadVideoById_(videoId, autoplay){
+  const vid = normalizeVideoId_(videoId);
+  if (!vid) return;
+  if (YTReady && YTPlayer && typeof YTPlayer.loadVideoById === "function"){
+    YTPlayer.loadVideoById({ videoId: vid, startSeconds: 0 });
+    if (autoplay) YTPlayer.playVideo();
+  } else {
+    pendingVideoId = vid;
+  }
+}
+
+function setupControls_(){
+  const btn = document.getElementById("ccPlay");
+  const seek = document.getElementById("ccSeek");
+  const time = document.getElementById("ccTime");
+  const fs = document.getElementById("ccFs");
+  const wrap = document.querySelector(".player-wrap");
+  let seeking = false;
+
+  if (btn){
+    btn.addEventListener("click", () => {
+      if (!YTPlayer) return;
+      const st = YTPlayer.getPlayerState();
+      if (st === 1) YTPlayer.pauseVideo();
+      else YTPlayer.playVideo();
+    });
+  }
+
+  if (seek){
+    seek.addEventListener("input", () => { seeking = true; });
+    seek.addEventListener("change", () => {
+      if (!YTPlayer) return;
+      const dur = YTPlayer.getDuration ? YTPlayer.getDuration() : 0;
+      const v = Number(seek.value || 0) / 1000;
+      if (dur > 0) YTPlayer.seekTo(dur * v, true);
+      seeking = false;
+    });
+  }
+
+  // Fullscreen propio (funciona en móvil, depende del navegador)
+  async function toggleFs(){
+    if (!wrap) return;
+    try{
+      const isFs = document.fullscreenElement || document.webkitFullscreenElement;
+      if (isFs){
+        if (document.exitFullscreen) await document.exitFullscreen();
+        else if (document.webkitExitFullscreen) await document.webkitExitFullscreen();
+      } else {
+        if (wrap.requestFullscreen) await wrap.requestFullscreen();
+        else if (wrap.webkitRequestFullscreen) await wrap.webkitRequestFullscreen();
+      }
+    }catch(e){}
+  }
+  if (fs) fs.addEventListener("click", toggleFs);
+
+  // Actualiza UI
+  setInterval(() => {
+    if (!YTPlayer) return;
+    if (seek && !seeking){
+      const dur = YTPlayer.getDuration ? YTPlayer.getDuration() : 0;
+      const cur = YTPlayer.getCurrentTime ? YTPlayer.getCurrentTime() : 0;
+      if (dur > 0){
+        seek.value = String(Math.round((cur / dur) * 1000));
+        if (time) time.textContent = fmtTime_(cur) + " / " + fmtTime_(dur);
+      }
+    }
+  }, 500);
+}
+
+// YouTube API callback
+window.onYouTubeIframeAPIReady = function(){
+  YTReady = true;
+
+  YTPlayer = new YT.Player("player", {
+    width: "100%",
+    height: "100%",
+    playerVars: {
+      controls: 0,          // sin botones de YouTube (no share, no YouTube button)
+      rel: 0,
+      modestbranding: 1,
+      iv_load_policy: 3,
+      playsinline: 1,
+      disablekb: 1,
+      fs: 0                // fullscreen lo manejamos nosotros (botón ⛶)
+    },
+    events: {
+      onReady: () => {
+        setupControls_();
+        if (pendingVideoId){
+          loadVideoById_(pendingVideoId, false);
+          pendingVideoId = null;
+        }
+      },
+      onStateChange: (e) => {
+        const btn = document.getElementById("ccPlay");
+        if (!btn) return;
+        if (e.data === 1) btn.textContent = "⏸";
+        else btn.textContent = "▶";
+      }
+    }
+  });
+};
+
+ensureYT_();
+</script>
+
+<script>
 
 function cleanEmbedUrl_(url){
   const u = String(url||"").trim();
@@ -384,7 +564,7 @@ function escapeHtml_(s){
       `;
       b.onclick = () => {
         setActive(b);
-        loadVideoById_(videoId);
+        loadVideoById_(videoId, true);
         document.getElementById("nowPlaying").textContent = "Reproduciendo: " + m.title;
         const nt = document.getElementById("nowTitle"); if (nt) nt.textContent = m.title;
         const yt = document.getElementById("openYT");
@@ -470,133 +650,6 @@ function escapeHtml_(s){
       location.href = "index.html";
     });
   }
-})();
-</script>
-
-
-<script>
-/* ===== YouTube IFrame Player API (controles propios) ===== */
-let YTPlayer = null;
-let YTReady = false;
-let pendingVideoId = null;
-let seeking = false;
-
-function fmtTime_(sec){
-  sec = Math.max(0, Math.floor(sec || 0));
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return m + ":" + String(s).padStart(2, "0");
-}
-
-function getVideoIdFromAny_(value){
-  if (!value) return "";
-  // si ya es id
-  if (/^[a-zA-Z0-9_-]{11}$/.test(value)) return value;
-
-  // soporta youtu.be/ID, watch?v=ID, /embed/ID
-  const m = String(value).match(/(?:youtu\.be\/|v=|\/embed\/)([a-zA-Z0-9_-]{11})/);
-  return m ? m[1] : "";
-}
-
-function loadVideoById_(videoId){
-  const vid = getVideoIdFromAny_(videoId);
-  if (!vid) return;
-  if (YTReady && YTPlayer && typeof YTPlayer.loadVideoById === "function"){
-    YTPlayer.loadVideoById({ videoId: vid, startSeconds: 0 });
-  } else {
-    pendingVideoId = vid;
-  }
-}
-
-// Crea el player cuando la API está lista
-window.onYouTubeIframeAPIReady = function(){
-  YTReady = true;
-  YTPlayer = new YT.Player("player", {
-    width: "100%",
-    height: "100%",
-    playerVars: {
-      autoplay: 0,
-      controls: 0,      // SIN controles de YouTube
-      fs: 0,            // SIN fullscreen (evita modo horizontal del player nativo)
-      rel: 0,
-      modestbranding: 1,
-      iv_load_policy: 3,
-      disablekb: 1,
-      playsinline: 1
-    },
-    events: {
-      onReady: () => {
-        // engancha controles
-        const btn = document.getElementById("ccPlay");
-        const seek = document.getElementById("ccSeek");
-        const time = document.getElementById("ccTime");
-
-        if (btn){
-          btn.addEventListener("click", () => {
-            if (!YTPlayer) return;
-            const st = YTPlayer.getPlayerState();
-            if (st === 1) { // playing
-              YTPlayer.pauseVideo();
-            } else {
-              YTPlayer.playVideo();
-            }
-          });
-        }
-
-        if (seek){
-          const setSeekUI = () => {
-            if (!YTPlayer || seeking) return;
-            const dur = YTPlayer.getDuration ? YTPlayer.getDuration() : 0;
-            const cur = YTPlayer.getCurrentTime ? YTPlayer.getCurrentTime() : 0;
-            if (dur > 0){
-              seek.value = String(Math.round((cur/dur)*1000));
-              if (time) time.textContent = fmtTime_(cur) + " / " + fmtTime_(dur);
-            }
-          };
-
-          seek.addEventListener("input", () => { seeking = true; });
-          seek.addEventListener("change", () => {
-            if (!YTPlayer) return;
-            const dur = YTPlayer.getDuration ? YTPlayer.getDuration() : 0;
-            const v = Number(seek.value || 0) / 1000;
-            if (dur > 0){
-              YTPlayer.seekTo(dur * v, true);
-            }
-            seeking = false;
-          });
-
-          // refresco UI
-          setInterval(setSeekUI, 500);
-        }
-
-        if (pendingVideoId){
-          loadVideoById_(pendingVideoId);
-          pendingVideoId = null;
-        }
-      },
-      onStateChange: (e) => {
-        const btn = document.getElementById("ccPlay");
-        if (!btn) return;
-        // 1 = playing, 2 = paused, 0 = ended
-        if (e.data === 1) btn.textContent = "⏸";
-        else btn.textContent = "▶";
-      }
-    }
-  });
-
-  // carga inicial si ya está definida por tu lógica
-  if (pendingVideoId){
-    loadVideoById_(pendingVideoId);
-    pendingVideoId = null;
-  }
-};
-
-// Carga el script de la API
-(function(){
-  const s = document.createElement("script");
-  s.src = "https://www.youtube.com/iframe_api";
-  s.async = true;
-  document.head.appendChild(s);
 })();
 </script>
 
