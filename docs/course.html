@@ -292,49 +292,11 @@ header > div:first-child { display:none !important; }
 
 
 <style>
-/* ==== Selects de velocidad/calidad ==== */
-.cc-select{
-  height:38px;
-  border-radius:12px;
-  border:1px solid rgba(255,255,255,.18);
-  background: rgba(0,0,0,.28);
-  color:#fff;
-  padding:0 10px;
-  font-size:13px;
-  outline:none;
-}
-.cc-select option{ color:#000; }
-</style>
-
-
-<style>
 /* Separar título del área de controles */
-.player-meta .left{
-  margin-top: 20px !important;
-}
-</style>
+.player-meta .left{ margin-top: 22px !important; }
 
-
-<style>
-/* ==== Ajuste v4: controles sobre el video, sin montar el título ==== */
-.player{ position:relative !important; }
-
-/* El escudo solo cubre el área del video */
-.tap-shield{ position:absolute; inset:0; z-index:50; }
-
-/* Controles flotantes dentro del video */
-#ccWrap{
-  position:absolute !important;
-  left:12px; right:12px;
-  bottom:12px;
-  z-index:60;
-}
-
-/* En fullscreen (del contenedor .player-wrap), mantener controles dentro del video */
-.player-wrap:fullscreen .player #ccWrap,
-.player-wrap:-webkit-full-screen .player #ccWrap{
-  left:16px; right:16px; bottom:16px;
-}
+/* Botón velocidad */
+.cc-speed{ width:56px !important; font-size:14px !important; }
 </style>
 
 </head>
@@ -371,18 +333,6 @@ header > div:first-child { display:none !important; }
 
 <div id="tapShield" class="tap-shield" aria-label="Zona protegida del video"></div>
 
-<div class="cc-wrap" id="ccWrap" aria-label="Controles del video">
-  <button class="cc-btn" id="ccPlay" type="button" aria-label="Reproducir / Pausar">▶</button>
-  <input class="cc-seek" id="ccSeek" type="range" min="0" max="1000" value="0" aria-label="Línea de tiempo">
-  <span class="cc-time" id="ccTime">0:00 / 0:00</span>
-  <select class="cc-select" id="ccSpeed" aria-label="Velocidad"></select>
-  
-  <button class="cc-btn" id="ccFs" type="button" aria-label="Pantalla completa">⛶</button>
-</div>
-
-
-          
-
       </div>
       <div class="player-meta">
         <div class="left">
@@ -391,7 +341,16 @@ header > div:first-child { display:none !important; }
         </div>
         <div class="right">
 
-<!-- Link externo oculto para mantener el reproductor limpio -->
+<div class="cc-wrap" id="ccWrap" aria-label="Controles del video">
+  <button class="cc-btn" id="ccPlay" type="button" aria-label="Reproducir / Pausar">▶</button>
+  <input class="cc-seek" id="ccSeek" type="range" min="0" max="1000" value="0" aria-label="Línea de tiempo">
+  <span class="cc-time" id="ccTime">0:00 / 0:00</span>
+  <button class="cc-btn cc-speed" id="ccSpeedBtn" type="button" aria-label="Velocidad">1x</button>
+  <button class="cc-btn" id="ccFs" type="button" aria-label="Pantalla completa">⛶</button>
+</div>
+
+
+          <!-- Link externo oculto para mantener el reproductor limpio -->
           <a class="smallbtn" id="openYT" href="#" target="_blank" rel="noopener" style="display:none">Ver en YouTube</a>
         </div>
     </section>
@@ -460,12 +419,26 @@ function setupControls_(){
   const wrap = document.querySelector(".player-wrap");
   let seeking = false;
 
-  
-  const speedSel = document.getElementById("ccSpeed");
-  
+
+  const speedBtn = document.getElementById("ccSpeedBtn");
+  const speedRates = [0.5, 0.75, 1, 1.25, 1.5, 2];
+  let speedIdx = 2; // 1x
+
+  function applySpeed_(){
+    if (!YTPlayer) return;
+    const r = speedRates[speedIdx] || 1;
+    try{ YTPlayer.setPlaybackRate(r); }catch(e){}
+    if (speedBtn) speedBtn.textContent = (r % 1 === 0 ? String(r).replace('.0','') : String(r)) + "x";
   }
 
-if (btn){
+  if (speedBtn){
+    speedBtn.addEventListener("click", () => {
+      speedIdx = (speedIdx + 1) % speedRates.length;
+      applySpeed_();
+    });
+  }
+
+  if (btn){
     btn.addEventListener("click", () => {
       if (!YTPlayer) return;
       const st = YTPlayer.getPlayerState();
@@ -534,7 +507,7 @@ window.onYouTubeIframeAPIReady = function(){
     events: {
       onReady: () => {
         setupControls_();
-if (pendingVideoId){
+        if (pendingVideoId){
           loadVideoById_(pendingVideoId, false);
           pendingVideoId = null;
         }
