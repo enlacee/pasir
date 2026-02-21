@@ -199,26 +199,6 @@
     .dd-item.danger{color:#fecaca}
 
   </style>
-
-<style>
-/* Bloquea taps sobre botones del reproductor que llevan a YouTube (esquinas inferiores) */
-.video-wrap, .video-container, #playerWrap, #videoWrap, #videoContainer,
-.player-wrap, .player-container, .video-frame-wrap { position: relative; }
-
-/* Si tu contenedor es el clásico con padding-bottom, esto lo cubre también */
-.yt-blocker{
-  position:absolute;
-  bottom:10px;
-  height:64px;
-  width:150px;
-  z-index:9999;
-  pointer-events:auto;
-  background:transparent;
-}
-#ytBlockLeft{ left:10px; }
-#ytBlockRight{ right:10px; width:190px; }
-</style>
-
 </head>
 <body>
   <header>
@@ -249,10 +229,13 @@
   <div class="container">
     <section class="player-wrap" aria-label="Reproductor">
       <div class="player">
-        <iframe id="player" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <div id="player" class="yt-player"></div>
 
-<div id="ytBlockLeft" class="yt-blocker" aria-hidden="true"></div>
-<div id="ytBlockRight" class="yt-blocker" aria-hidden="true"></div>
+<div id="ccWrap" class="cc-wrap" aria-label="Controles del video">
+  <button id="ccPlay" class="cc-btn" type="button" aria-label="Reproducir / Pausar">▶</button>
+  <input id="ccSeek" class="cc-seek" type="range" min="0" max="1000" value="0" aria-label="Barra de progreso">
+  <span id="ccTime" class="cc-time">0:00 / 0:00</span>
+</div>
 
       </div>
       <div class="player-meta">
@@ -401,9 +384,7 @@ function escapeHtml_(s){
       `;
       b.onclick = () => {
         setActive(b);
-        const baseUrl = cleanEmbedUrl_(m.embedUrl);
-        const url = baseUrl ? (baseUrl + (baseUrl.includes("?") ? "&" : "?") + "autoplay=1") : "";
-        document.getElementById("player").src = url;
+        loadVideoById_(videoId);
         document.getElementById("nowPlaying").textContent = "Reproduciendo: " + m.title;
         const nt = document.getElementById("nowTitle"); if (nt) nt.textContent = m.title;
         const yt = document.getElementById("openYT");
@@ -489,6 +470,133 @@ function escapeHtml_(s){
       location.href = "index.html";
     });
   }
+})();
+</script>
+
+
+<script>
+/* ===== YouTube IFrame Player API (controles propios) ===== */
+let YTPlayer = null;
+let YTReady = false;
+let pendingVideoId = null;
+let seeking = false;
+
+function fmtTime_(sec){
+  sec = Math.max(0, Math.floor(sec || 0));
+  const m = Math.floor(sec / 60);
+  const s = sec % 60;
+  return m + ":" + String(s).padStart(2, "0");
+}
+
+function getVideoIdFromAny_(value){
+  if (!value) return "";
+  // si ya es id
+  if (/^[a-zA-Z0-9_-]{11}$/.test(value)) return value;
+
+  // soporta youtu.be/ID, watch?v=ID, /embed/ID
+  const m = String(value).match(/(?:youtu\.be\/|v=|\/embed\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : "";
+}
+
+function loadVideoById_(videoId){
+  const vid = getVideoIdFromAny_(videoId);
+  if (!vid) return;
+  if (YTReady && YTPlayer && typeof YTPlayer.loadVideoById === "function"){
+    YTPlayer.loadVideoById({ videoId: vid, startSeconds: 0 });
+  } else {
+    pendingVideoId = vid;
+  }
+}
+
+// Crea el player cuando la API está lista
+window.onYouTubeIframeAPIReady = function(){
+  YTReady = true;
+  YTPlayer = new YT.Player("player", {
+    width: "100%",
+    height: "100%",
+    playerVars: {
+      autoplay: 0,
+      controls: 0,      // SIN controles de YouTube
+      fs: 0,            // SIN fullscreen (evita modo horizontal del player nativo)
+      rel: 0,
+      modestbranding: 1,
+      iv_load_policy: 3,
+      disablekb: 1,
+      playsinline: 1
+    },
+    events: {
+      onReady: () => {
+        // engancha controles
+        const btn = document.getElementById("ccPlay");
+        const seek = document.getElementById("ccSeek");
+        const time = document.getElementById("ccTime");
+
+        if (btn){
+          btn.addEventListener("click", () => {
+            if (!YTPlayer) return;
+            const st = YTPlayer.getPlayerState();
+            if (st === 1) { // playing
+              YTPlayer.pauseVideo();
+            } else {
+              YTPlayer.playVideo();
+            }
+          });
+        }
+
+        if (seek){
+          const setSeekUI = () => {
+            if (!YTPlayer || seeking) return;
+            const dur = YTPlayer.getDuration ? YTPlayer.getDuration() : 0;
+            const cur = YTPlayer.getCurrentTime ? YTPlayer.getCurrentTime() : 0;
+            if (dur > 0){
+              seek.value = String(Math.round((cur/dur)*1000));
+              if (time) time.textContent = fmtTime_(cur) + " / " + fmtTime_(dur);
+            }
+          };
+
+          seek.addEventListener("input", () => { seeking = true; });
+          seek.addEventListener("change", () => {
+            if (!YTPlayer) return;
+            const dur = YTPlayer.getDuration ? YTPlayer.getDuration() : 0;
+            const v = Number(seek.value || 0) / 1000;
+            if (dur > 0){
+              YTPlayer.seekTo(dur * v, true);
+            }
+            seeking = false;
+          });
+
+          // refresco UI
+          setInterval(setSeekUI, 500);
+        }
+
+        if (pendingVideoId){
+          loadVideoById_(pendingVideoId);
+          pendingVideoId = null;
+        }
+      },
+      onStateChange: (e) => {
+        const btn = document.getElementById("ccPlay");
+        if (!btn) return;
+        // 1 = playing, 2 = paused, 0 = ended
+        if (e.data === 1) btn.textContent = "⏸";
+        else btn.textContent = "▶";
+      }
+    }
+  });
+
+  // carga inicial si ya está definida por tu lógica
+  if (pendingVideoId){
+    loadVideoById_(pendingVideoId);
+    pendingVideoId = null;
+  }
+};
+
+// Carga el script de la API
+(function(){
+  const s = document.createElement("script");
+  s.src = "https://www.youtube.com/iframe_api";
+  s.async = true;
+  document.head.appendChild(s);
 })();
 </script>
 
