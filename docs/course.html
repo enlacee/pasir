@@ -28,7 +28,7 @@
       backdrop-filter: blur(8px);
       display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
     }
-    #courseTitle{font-weight:1000}
+    #courseTitle{font-weight:1000;font-size:20px;}
     .muted{color:var(--muted)}
 
     .top-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
@@ -200,12 +200,7 @@
 
   </style>
 
-<style>
-/* ==== Ajustes solicitados: ocultar título y perfil (menú usuario) ==== */
-#courseTitle, #nowPlaying, #userMenu { display:none !important; }
-/* Mantén el header pero solo con "Mis cursos" */
-header > div:first-child { display:none !important; }
-</style>
+
 
 <style>#openYT{display:none !important;}</style>
 
@@ -650,7 +645,7 @@ function escapeHtml_(s){
       `;
       b.onclick = () => {
         setActive(b);
-        loadVideoById_(videoId, true);
+        loadVideoById_(videoId, false);
         document.getElementById("nowPlaying").textContent = "Reproduciendo: " + m.title;
         const nt = document.getElementById("nowTitle"); if (nt) nt.textContent = m.title;
         const yt = document.getElementById("openYT");
@@ -660,7 +655,7 @@ function escapeHtml_(s){
         }
       };
       box.appendChild(b);
-      if (idx === 0) b.click();
+      // autoplay eliminado: el alumno debe presionar play manualmente
     });
   })().catch(err => {
     showError(err.message || String(err));
