@@ -300,6 +300,12 @@
 #ccWrap{ bottom:28px !important; }
 </style>
 
+
+<style>
+/* Ocultar perfil/correo dentro del curso */
+#userMenu, #userDropdown, .user-menu, .user-dropdown, .user-chip, .profile-chip { display:none !important; }
+</style>
+
 </head>
 <body>
   <header>
@@ -376,6 +382,7 @@
 let YTPlayer = null;
 let YTReady = false;
 let pendingVideoId = null;
+let videoLoadedFlag = false;
 
 function fmtTime_(sec){
   sec = Math.max(0, Math.floor(sec || 0));
@@ -645,6 +652,7 @@ function escapeHtml_(s){
       `;
       b.onclick = () => {
         setActive(b);
+        videoLoadedFlag = true;
         loadVideoById_(videoId, false);
         document.getElementById("nowPlaying").textContent = "Reproduciendo: " + m.title;
         const nt = document.getElementById("nowTitle"); if (nt) nt.textContent = m.title;
@@ -743,7 +751,7 @@ function escapeHtml_(s){
   let hideTimer = null;
 
   function showControls(){
-    if (!wrap) return;
+    if (!wrap || !videoLoadedFlag) return;
     wrap.classList.add("is-visible");
     if (hideTimer) clearTimeout(hideTimer);
     hideTimer = setTimeout(() => {
