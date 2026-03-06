@@ -374,6 +374,35 @@ body[data-theme="light"] .cc-time{
 }
 </style>
 
+
+<style id="center-balanced-fix">
+/* === Centrar correctamente reproductor y módulos en móvil === */
+@media (max-width:700px){
+
+  main.page > .container{
+    width:100% !important;
+    max-width:680px !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+    padding:6px 12px 22px 12px !important;
+  }
+
+  main.page > .container > .container{
+    width:100% !important;
+    margin-left:auto !important;
+    margin-right:auto !important;
+    padding:0 !important;
+  }
+
+  .player-wrap,
+  .curriculum{
+    margin-left:auto !important;
+    margin-right:auto !important;
+  }
+
+}
+</style>
+
 </head>
 <body data-theme="light">
   
