@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Mis cursos</title>
   <style>
-    body{font-family:system-ui;margin:0;background:#0b1220;color:#f9fafb;min-height:100vh}
+    body{font-family:system-ui;margin:0;background: var(--bg);color: var(--text);min-height:100vh}
     header{padding:14px 16px;border-bottom:1px solid rgba(148,163,184,.25);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
     .wrap{max-width:980px;margin:0 auto;padding:16px}
     .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
@@ -14,7 +14,7 @@
     .muted{color:#9ca3af}
     .btn{display:inline-block;padding:10px 12px;border-radius:12px;text-decoration:none;font-weight:900}
     .primary{background:#22c55e;color:#071018;border:0;cursor:pointer}
-    .secondary{background:rgba(56,189,248,.18);color:#f9fafb;border:1px solid rgba(56,189,248,.35)}
+    .secondary{background:rgba(56,189,248,.18);color: var(--text);border:1px solid rgba(56,189,248,.35)}
     .err{color:#fca5a5;font-weight:700;white-space:pre-wrap}
   
 
@@ -197,12 +197,32 @@
 </style>
 
   <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#0b1220">
+  <meta name="theme-color" id="theme-color-meta" content="\1"/>
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-<style id="account-requested-fixes">.hero p{margin:0 !important;font-size:13px !important;color:var(--text) !important;opacity:.85 !important;}.course{background:#ffffff !important;border:1px solid rgba(148,163,184,.25) !important;color:#0f172a !important;}body[data-theme="dark"] .course{background:rgba(15,23,42,.98) !important;color:#f9fafb !important;}body[data-theme="dark"] .course-sub{color:rgba(255,255,255,.72) !important;}body[data-theme="light"] .course-sub{color:#64748b !important;}.course-meta .pill:first-child{background:#38bdf8 !important;color:#071018 !important;border:0 !important;}</style>
+<link rel="stylesheet" href="app.css">
+<script src="theme.js" defer></script>
 </head>
-<body>
-  <header>
+<body data-theme="light">
+  
+<header class="app-header">
+  <div class="container">
+    <div class="row">
+      <div class="brand" role="banner">
+        <span class="dot" aria-hidden="true"></span>
+        <span>Pasir Academy</span>
+      </div>
+      <div class="nav-actions">
+        <button class="btn theme-btn" id="theme-toggle" type="button" aria-label="Cambiar tema">
+          <span id="theme-icon">☀️</span>
+          <span id="theme-label" class="sr-only">Modo claro</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main class="page"><div class="container">
+<header>
     <div>
       <div class="title">Mis cursos</div>
       <div class="muted">Aquí verás solo los cursos que están habilitados para tu correo.</div>
@@ -408,5 +428,7 @@ list.innerHTML = cards;
     });
   }
 </script>
+
+</div></main>
 </body>
 </html>
