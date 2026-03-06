@@ -331,65 +331,23 @@
 </style>
 
 
-<style id="course-final-fixes">
-/* ===== Ajustes pedidos: reproductor más grande/cerca + botones visibles en modo claro ===== */
-
-/* subir un poco todo y dar más espacio real al reproductor */
-main.page > .container{
-  padding-top: 8px !important;
-}
+<style id="final-center-fix">
+/* centrar reproductor y módulos */
 main.page > .container > .container{
-  padding: 0 !important;
-  margin-top: 4px !important;
-}
-.player-wrap{
-  max-width: 760px !important;
-  margin: 0 auto !important;
-}
-.player{
-  padding-top: 62% !important;
-}
-
-/* en móvil vertical: hacerlo un poco más grande */
-@media (max-width: 600px){
-  main.page > .container{
-    padding: 6px 10px 22px !important;
-  }
-  .player{
-    padding-top: 64% !important;
-  }
-}
-
-/* botones velocidad y expandir visibles en modo claro */
-body[data-theme="light"] #ccSpeedBtn,
-body[data-theme="light"] #ccFs,
-body[data-theme="light"] .cc-btn{
-  background: #eaf2ff !important;
-  color: #0f172a !important;
-  border: 1px solid rgba(37,99,235,.25) !important;
-}
-body[data-theme="light"] .cc-time{
-  color: #0f172a !important;
-  opacity: .92 !important;
-}
-</style>
-
-
-<style id="center-fix">
-/* centrar todo el contenido para que no quede pegado a la derecha */
-main.page > .container{
-max-width:760px;
-margin:0 auto;
-padding-left:12px;
-padding-right:12px;
-}
-
-.player-wrap{
+max-width:720px !important;
 margin:0 auto !important;
+padding-left:16px !important;
+padding-right:16px !important;
+}
+
+.player-wrap{
+margin-left:auto !important;
+margin-right:auto !important;
 }
 
 .curriculum{
-margin:14px auto 0 auto !important;
+margin-left:auto !important;
+margin-right:auto !important;
 }
 </style>
 
