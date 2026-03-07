@@ -199,7 +199,103 @@
     .dd-sep{height:1px;background:rgba(148,163,184,.18);margin:6px 4px}
     .dd-item.danger{color:#fecaca}
 
-  </style>
+  
+/* === Ajustes responsive mínimos, sin tocar tu estilo base === */
+.wrap{
+  display:grid;
+  grid-template-columns:minmax(260px, 320px) minmax(0, 1fr) minmax(300px, 420px);
+  gap:20px;
+  align-items:start;
+}
+.player-wrap{
+  width:100%;
+  max-width:none !important;
+  margin:0 !important;
+}
+.player{
+  width:100%;
+  min-height:auto;
+}
+.curriculum{
+  width:100%;
+  min-width:0;
+}
+#modules{
+  overflow:auto;
+}
+
+/* PC / tablet horizontal */
+@media (min-width: 901px){
+  .wrap{
+    grid-template-columns:minmax(260px, 320px) minmax(0, 1fr) minmax(320px, 460px);
+  }
+  .player-wrap{
+    position:sticky;
+    top:88px;
+  }
+  .curriculum{
+    position:sticky;
+    top:88px;
+  }
+  #modules{
+    max-height:calc(100vh - 180px);
+  }
+}
+
+/* Móvil vertical */
+@media (max-width: 900px){
+  .wrap{
+    grid-template-columns:1fr;
+    gap:14px;
+  }
+  .player-wrap,
+  .curriculum{
+    position:static;
+  }
+  #modules{
+    max-height:none;
+  }
+}
+
+/* Móvil horizontal: video fijo al costado y módulos desplazables */
+@media (max-width: 950px) and (orientation: landscape){
+  .wrap{
+    grid-template-columns:minmax(200px, 0.95fr) minmax(0, 1.45fr) minmax(260px, 0.95fr);
+    gap:14px;
+    align-items:start;
+  }
+
+  .player-wrap{
+    position:sticky;
+    top:72px;
+  }
+
+  .curriculum{
+    position:sticky;
+    top:72px;
+  }
+
+  #modules{
+    max-height:calc(100vh - 150px);
+    overflow:auto;
+  }
+
+  .player{
+    min-height:auto !important;
+  }
+}
+
+/* Afinado para pantallas muy bajas en horizontal */
+@media (max-height: 500px) and (orientation: landscape){
+  .app-header{padding:4px 12px !important;height:48px !important;min-height:48px !important;}
+  .app-header .row{height:48px !important;min-height:48px !important;}
+  main.page > .container{padding-top:6px !important}
+  .wrap{gap:12px}
+  .hero h1, #courseTitle{font-size:clamp(22px, 2vw, 34px) !important;}
+  #modules{max-height:calc(100vh - 132px)}
+}
+
+</style>
 
 
 
