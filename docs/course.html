@@ -600,6 +600,16 @@ body[data-theme="light"] .cc-time{
 }
 </style>
 
+
+<style id="course-progress-ui">
+.mod.done{background:rgba(34,197,94,.16)!important}
+.mod.done .t::before{content:"✔ ";color:#22c55e;font-weight:1000}
+.mod.current .t::before{content:"▶ ";color:#38bdf8;font-weight:1000}
+.mod .s.completed-text{color:#86efac!important;font-weight:800}
+#courseProgressBadge{display:inline-flex;align-items:center;gap:8px;padding:6px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);font-weight:900;font-size:12px}
+body[data-theme="light"] #courseProgressBadge{border-color:rgba(37,99,235,.20);background:#eef6ff;color:#0f172a}
+</style>
+
 </head>
 <body data-theme="light">
   
@@ -681,7 +691,7 @@ body[data-theme="light"] .cc-time{
           <h2>Módulos</h2>
           <div class="sub">Selecciona una clase para reproducir</div>
         </div>
-        <div class="sub" id="countMods"></div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><div class="sub" id="countMods"></div><div id="courseProgressBadge">0%</div></div>
       </div>
 
       <div id="modules"></div>
@@ -804,6 +814,7 @@ function setupControls_(){
       if (dur > 0){
         seek.value = String(Math.round((cur / dur) * 1000));
         if (time) time.textContent = fmtTime_(cur) + " / " + fmtTime_(dur);
+        if (currentModuleIndex >= 0) setCurrentTimeForModule(currentModuleIndex, cur);
       }
     }
   }, 500);
@@ -835,9 +846,29 @@ window.onYouTubeIframeAPIReady = function(){
       },
       onStateChange: (e) => {
         const btn = document.getElementById("ccPlay");
-        if (!btn) return;
-        if (e.data === 1) btn.textContent = "⏸";
-        else btn.textContent = "▶";
+        if (btn) {
+          if (e.data === 1) btn.textContent = "⏸";
+          else btn.textContent = "▶";
+        }
+
+        if (e.data === 1 && currentModuleIndex >= 0) {
+          renderProgressUI();
+          if (resumePending) {
+            const resume = getResumeTime(currentModuleIndex);
+            if (resume > 2) {
+              try { YTPlayer.seekTo(resume, true); } catch(err){}
+            }
+            resumePending = false;
+          }
+        }
+
+        if (e.data === 0 && currentModuleIndex >= 0) {
+          markModuleCompleted(currentModuleIndex);
+          const nextIndex = currentModuleIndex + 1;
+          if (nextIndex < courseModules.length) {
+            setTimeout(() => openModuleByIndex(nextIndex, false), 700);
+          }
+        }
       }
     }
   });
@@ -914,6 +945,94 @@ function escapeHtml_(s){
 
   const params = new URLSearchParams(location.search);
   const courseId = params.get("courseId");
+  const courseProgressKey = () => "pasir_progress_" + (courseId || "curso");
+  let courseModules = [];
+  let currentModuleIndex = -1;
+  let resumePending = false;
+
+  function loadCourseProgress(){
+    try { return JSON.parse(localStorage.getItem(courseProgressKey()) || "{}"); }
+    catch(e){ return {}; }
+  }
+
+  function saveCourseProgress(data){
+    localStorage.setItem(courseProgressKey(), JSON.stringify(data || {}));
+  }
+
+  function markModuleCompleted(idx){
+    const p = loadCourseProgress();
+    if (!Array.isArray(p.completed)) p.completed = [];
+    if (!p.completed.includes(idx)) p.completed.push(idx);
+    p.lastIndex = idx;
+    p.updatedAt = Date.now();
+    saveCourseProgress(p);
+    renderProgressUI();
+  }
+
+  function setLastModule(idx){
+    const p = loadCourseProgress();
+    p.lastIndex = idx;
+    p.updatedAt = Date.now();
+    saveCourseProgress(p);
+    renderProgressUI();
+  }
+
+  function setCurrentTimeForModule(idx, seconds){
+    const p = loadCourseProgress();
+    p.lastIndex = idx;
+    p.lastTime = Math.max(0, Math.floor(seconds || 0));
+    p.updatedAt = Date.now();
+    saveCourseProgress(p);
+  }
+
+  function getResumeTime(idx){
+    const p = loadCourseProgress();
+    if (p.lastIndex === idx) return Math.max(0, Math.floor(p.lastTime || 0));
+    return 0;
+  }
+
+  function completedPercent(){
+    const p = loadCourseProgress();
+    const total = courseModules.length || 0;
+    const done = Array.isArray(p.completed) ? p.completed.length : 0;
+    return total ? Math.round((done / total) * 100) : 0;
+  }
+
+  function renderProgressUI(){
+    const p = loadCourseProgress();
+    const completed = Array.isArray(p.completed) ? p.completed : [];
+    const badge = document.getElementById("courseProgressBadge");
+    if (badge) badge.textContent = completedPercent() + "%";
+
+    document.querySelectorAll("#modules .mod").forEach((btn, idx) => {
+      btn.classList.remove("done","current");
+      const s = btn.querySelector(".s");
+      if (completed.includes(idx)) {
+        btn.classList.add("done");
+        if (s) {
+          s.textContent = "Completada";
+          s.classList.add("completed-text");
+        }
+      } else {
+        if (s) {
+          s.textContent = "Toca para reproducir";
+          s.classList.remove("completed-text");
+        }
+      }
+      if (idx === currentModuleIndex) {
+        btn.classList.add("current");
+        if (s && !completed.includes(idx)) s.textContent = "En reproducción";
+      }
+    });
+  }
+
+  function openModuleByIndex(idx, shouldResume){
+    const btn = document.querySelectorAll("#modules .mod")[idx];
+    if (!btn) return;
+    resumePending = !!shouldResume;
+    btn.click();
+  }
+
 
   document.getElementById("logout").onclick = () => {
     localStorage.removeItem("pasir_token");
@@ -950,10 +1069,12 @@ function escapeHtml_(s){
     box.innerHTML = "";
     showError("");
 
-    document.getElementById("countMods").textContent = (r.modules?.length||0) + " clases";
-    r.modules.forEach((m, idx) => {
+        courseModules = Array.isArray(r.modules) ? r.modules : [];
+    document.getElementById("countMods").textContent = (courseModules.length||0) + " clases";
+    courseModules.forEach((m, idx) => {
       const b = document.createElement("button");
       b.className = "mod";
+      b.dataset.index = idx;
       const videoId = (m.videoId) || (m.embedUrl || "").split("/embed/")[1]?.split("?")[0] || "";
       const thumb = videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : "icons/icon-192.png";
       b.innerHTML = `
@@ -964,20 +1085,24 @@ function escapeHtml_(s){
         </div>
       `;
       b.onclick = () => {
+        currentModuleIndex = idx;
         setActive(b);
+        setLastModule(idx);
         videoLoadedFlag = true;
         loadVideoById_(videoId, false);
         document.getElementById("nowPlaying").textContent = "Reproduciendo: " + m.title;
         const nt = document.getElementById("nowTitle"); if (nt) nt.textContent = m.title;
         const yt = document.getElementById("openYT");
-        if (yt) {
-          const vid = (m.videoId) || (m.embedUrl || "").split("/embed/")[1]?.split("?")[0] || "";
-          yt.removeAttribute("href");
-        }
+        if (yt) yt.removeAttribute("href");
+        renderProgressUI();
       };
       box.appendChild(b);
-      // autoplay eliminado: el alumno debe presionar play manualmente
     });
+
+    renderProgressUI();
+    const saved = loadCourseProgress();
+    const startIndex = (typeof saved.lastIndex === "number" && saved.lastIndex >= 0 && saved.lastIndex < courseModules.length) ? saved.lastIndex : 0;
+    if (courseModules.length > 0) openModuleByIndex(startIndex, true);
   })().catch(err => {
     showError(err.message || String(err));
   });
