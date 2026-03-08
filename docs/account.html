@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Mis cursos</title>
   <style>
-    html.auth-checking, html.auth-checking body { visibility:hidden; }
     body{font-family:system-ui;margin:0;background: var(--bg);color: var(--text);min-height:100vh}
     header{padding:14px 16px;border-bottom:1px solid rgba(148,163,184,.25);display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
     .wrap{max-width:980px;margin:0 auto;padding:16px}
@@ -17,6 +16,7 @@
     .primary{background:#22c55e;color:#071018;border:0;cursor:pointer}
     .secondary{background:rgba(56,189,248,.18);color: var(--text);border:1px solid rgba(56,189,248,.35)}
     .err{color:#fca5a5;font-weight:700;white-space:pre-wrap}
+  
 
 /* ===== Netflix-like cards ===== */
 .hero{
@@ -94,6 +94,7 @@
 @media (max-width: 520px){
   .course-card{min-width: 78vw; max-width: 84vw;}
 }
+
 
 /* ===== User dropdown ===== */
 .user-menu{position:relative}
@@ -184,34 +185,48 @@
   background: rgba(255,255,255,.10);
   overflow:hidden;border:1px solid rgba(255,255,255,.08);
 }
-.progress > div{height:100%;width:20% ;background: rgba(34,197,94,.75);}
+.progress > div{height:100%;width:20% ;background: rgba(34,197,94,.75);} /* default */
+
 
 @media (max-width: 520px){
   .course{max-width: none;}
   .course-grid{grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));}
 }
+
+
 </style>
 
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" id="theme-color-meta" content="\1"/>
   <link rel="apple-touch-icon" href="icons/icon-192.png">
-  <link rel="stylesheet" href="app.css">
-  <script src="theme.js" defer></script>
+<link rel="stylesheet" href="app.css">
+<script src="theme.js" defer></script>
 
-  <script>
-    document.documentElement.classList.add("auth-checking");
-    (function () {
-      const token = localStorage.getItem("pasir_token");
-      if (!token) {
-        location.replace("login.html");
-        return;
-      }
-      document.documentElement.classList.remove("auth-checking");
-    })();
-  </script>
+<style id="account-progress-upgrades">
+.course-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.btn-continue{
+  display:inline-flex;align-items:center;justify-content:center;
+  padding:8px 10px;border-radius:10px;text-decoration:none;
+  font-weight:900;font-size:12px;
+  background:rgba(34,197,94,.16);
+  border:1px solid rgba(34,197,94,.30);
+  color:inherit;
+}
+.progress-meta{
+  display:flex;justify-content:space-between;align-items:center;gap:8px;
+  font-size:12px;color:rgba(255,255,255,.78);margin-top:8px;
+}
+body[data-theme="light"] .btn-continue{
+  background:#ecfdf3;border-color:rgba(34,197,94,.28);color:#0f172a;
+}
+body[data-theme="light"] .progress-meta{
+  color:rgba(15,23,42,.72);
+}
+</style>
+
 </head>
 <body data-theme="light">
-
+  
 <header class="app-header">
   <div class="container">
     <div class="row">
@@ -301,6 +316,29 @@ function escapeHtml_(s){
     });
   }
 
+  function loadCourseProgress(courseId){
+    try{
+      return JSON.parse(localStorage.getItem("pasir_progress_" + courseId) || "{}");
+    }catch(e){
+      return {};
+    }
+  }
+
+  function getCourseProgress(courseId, apiProgress){
+    const p = loadCourseProgress(courseId);
+    const completed = Array.isArray(p.completed) ? p.completed.length : 0;
+    const total = Number(p.totalModules || 0);
+    const localPercent = total > 0 ? Math.round((completed / total) * 100) : 0;
+    const percent = localPercent > 0 ? localPercent : (Number.isFinite(apiProgress) ? apiProgress : 0);
+    return { percent, completed, total };
+  }
+
+  function continueHref(courseId){
+    return "course.html?courseId=" + encodeURIComponent(courseId);
+  }
+  window.getCourseProgress = getCourseProgress;
+
+
   const token = localStorage.getItem("pasir_token");
   if (!token) location.replace("login.html");
   (async () => {
@@ -308,8 +346,6 @@ function escapeHtml_(s){
       const r = await jsonp("me", { token });
       if (!r.ok) {
         localStorage.removeItem("pasir_token");
-        localStorage.removeItem("pasir_email");
-        localStorage.removeItem("pasir_name");
         return location.replace("login.html");
       }
 
@@ -322,46 +358,60 @@ function escapeHtml_(s){
         return;
       }
 
+      
       status.textContent = "";
 
+      // Opcional: mapea imágenes locales por courseId.
+      // Sube tus portadas a /assets/courses/ (en tu repo) con el nombre del courseId:
+      // assets/courses/logo8-basico.jpg
       const COURSE_IMAGES = {
+        // "logo8-basico": "assets/courses/logo8-basico.jpg",
       };
 
-      const cards = r.courses.map(c => {
-        const img =
-          c.imageUrl ||
-          COURSE_IMAGES[c.courseId] ||
-          `assets/courses/${encodeURIComponent(c.courseId)}.jpg`;
+      
+const cards = r.courses.map(c => {
+  const img =
+    c.imageUrl ||
+    COURSE_IMAGES[c.courseId] ||
+    `assets/courses/${encodeURIComponent(c.courseId)}.jpg`;
 
-        const pRaw = (c.progress ?? c.progreso);
-        const pNum = (typeof pRaw === "number") ? pRaw : (typeof pRaw === "string" ? parseFloat(pRaw) : NaN);
-        const progress = Number.isFinite(pNum) ? Math.max(0, Math.min(100, pNum)) : 0;
+  const pRaw = (c.progress ?? c.progreso);
+  const pNum = (typeof pRaw === "number") ? pRaw : (typeof pRaw === "string" ? parseFloat(pRaw) : NaN);
+  const apiProgress = Number.isFinite(pNum) ? Math.max(0, Math.min(100, pNum)) : 0;
+  const saved = getCourseProgress(c.courseId, apiProgress);
+  const progress = saved.percent;
+  const continueText = progress > 0 ? "Continuar donde lo dejaste" : "Empezar curso";
 
-        return `
-          <a class="course" href="course.html?courseId=${encodeURIComponent(c.courseId)}" aria-label="${escapeHtml_(c.title)}">
-            <div class="course-cover">
-              <img src="${img}" alt="${escapeHtml_(c.title)}"
-                onerror="this.onerror=null;this.src='icons/icon-512.png';" />
-            </div>
-            <div class="course-body">
-              <p class="course-title">${escapeHtml_(c.title)}</p>
-              <p class="course-sub">${escapeHtml_(c.courseId)}</p>
-              <div class="progress" aria-label="Progreso"><div style="width:${progress}%"></div></div>
-              <div class="course-meta">
-                <span class="pill">Continuar</span>
-                <span class="pill">${progress}%</span>
-              </div>
-            </div>
-          </a>
-        `;
-      }).join("");
+  return `
+    <div class="course" aria-label="${escapeHtml_(c.title)}">
+      <a class="course-cover" href="${continueHref(c.courseId)}">
+        <img src="${img}" alt="${escapeHtml_(c.title)}"
+          onerror="this.onerror=null;this.src='icons/icon-512.png';" />
+      </a>
+      <div class="course-body">
+        <p class="course-title">${escapeHtml_(c.title)}</p>
+        <p class="course-sub">${escapeHtml_(c.courseId)}</p>
+        <div class="progress" aria-label="Progreso"><div style="width:${progress}%"></div></div>
+        <div class="progress-meta">
+          <span>${progress}% completado</span>
+          <span>${saved.total ? `${saved.completed}/${saved.total} módulos` : (progress > 0 ? "En progreso" : "Sin iniciar")}</span>
+        </div>
+        <div class="course-actions">
+          <a class="btn-continue" href="${continueHref(c.courseId)}">${continueText}</a>
+          <span class="pill">${progress}%</span>
+        </div>
+      </div>
+    </div>
+  `;
+}).join("");
 
-      list.innerHTML = cards;
-    } catch (e) {
+list.innerHTML = cards;
+} catch (e) {
       document.getElementById("status").innerHTML = '<div class="err">'+(e.message || e)+'</div>';
     }
   })();
 </script>
+
 
 <script>
 (function(){
@@ -394,17 +444,17 @@ function escapeHtml_(s){
   if (token && userMenu) userMenu.style.display = "inline-block";
 
   async function hydrateUser(){
-    const storedName = localStorage.getItem("pasir_email") || localStorage.getItem("pasir_name");
+    const storedName = sessionStorage.getItem("pasir_email") || sessionStorage.getItem("pasir_name");
     if (storedName && userNameEl) userNameEl.textContent = storedName;
 
     if (!token) return;
     try{
       const r = await jsonp("me", { token });
       if (!r.ok) return;
-      const email = (r.user && (r.user.email || r.user.correo)) || r.email || localStorage.getItem("pasir_email") || "";
+      const email = (r.user && (r.user.email || r.user.correo)) || r.email || sessionStorage.getItem("pasir_email") || "";
 
       if (email && userNameEl) userNameEl.textContent = email;
-      if (email) localStorage.setItem("pasir_email", email);
+      if (email) sessionStorage.setItem("pasir_email", email);
       if (userMenu) userMenu.style.display = "inline-block";
     }catch(e){}
   }
@@ -416,7 +466,6 @@ function escapeHtml_(s){
       e.preventDefault();
       localStorage.removeItem("pasir_token");
       localStorage.removeItem("pasir_name");
-      localStorage.removeItem("pasir_email");
       location.replace("index.html");
     });
   }
@@ -424,6 +473,7 @@ function escapeHtml_(s){
 </script>
 
 <script>
+  // PWA: registrar Service Worker
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("./sw.js").catch(() => {});
