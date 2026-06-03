@@ -4,18 +4,18 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Pasir Academy – Escuela Online de Electricidad Industrial</title>
+<title>Pasir Academy</title>
 
-<meta name="description"
-content="Domina la Electricidad Industrial desde cero hasta nivel práctico real. La plataforma se encuentra actualmente en proceso de migración y actualización de infraestructura.">
+<meta name="description" content="Pasir Academy se encuentra en proceso de actualización. Accede a nuestro nuevo portal de contenidos tecnológicos.">
+<meta name="theme-color" content="#2563eb">
 
 <style>
 :root{
     --primary:#0f172a;
+    --secondary:#64748b;
     --accent:#2563eb;
-    --text:#475569;
+    --border:#e2e8f0;
     --bg:#f8fafc;
-    --card:#ffffff;
 }
 
 *{
@@ -25,108 +25,231 @@ content="Domina la Electricidad Industrial desde cero hasta nivel práctico real
 }
 
 body{
-    font-family: Inter, Segoe UI, Arial, sans-serif;
+    font-family:Inter,Segoe UI,Arial,sans-serif;
+    background:linear-gradient(135deg,#f8fafc,#eef2ff);
+
     min-height:100vh;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    background:linear-gradient(135deg,#f8fafc,#e2e8f0);
-    padding:20px;
+    min-height:100dvh;
+
+    /* display:grid; */
+    place-items:center;
+
+    padding:12px;
+
+    overflow-x:hidden;
 }
 
 .card{
-    max-width:850px;
     width:100%;
-    background:white;
+    max-width:850px;
+
+    background:#fff;
+
     border-radius:24px;
-    padding:48px;
-    box-shadow:0 20px 60px rgba(0,0,0,.12);
+
+    padding:28px;
+
+    text-align:center;
+
+    box-shadow:
+        0 10px 30px rgba(15,23,42,.08),
+        0 20px 50px rgba(15,23,42,.05);
 }
 
 .badge{
     display:inline-block;
+
     padding:8px 14px;
+
     border-radius:999px;
-    background:#dbeafe;
+
+    background:#eff6ff;
     color:#1d4ed8;
+
+    font-size:.85rem;
     font-weight:600;
-    margin-bottom:20px;
+
+    margin-bottom:16px;
 }
 
 h1{
-    font-size:clamp(2rem,5vw,3.2rem);
     color:var(--primary);
-    margin-bottom:20px;
+
+    font-size:clamp(2rem,5vw,3.2rem);
+
+    margin-bottom:14px;
+
+    line-height:1.1;
 }
 
 .lead{
-    color:var(--text);
-    line-height:1.8;
-    font-size:1.1rem;
+    max-width:650px;
+
+    margin:0 auto;
+
+    color:var(--secondary);
+
+    line-height:1.6;
+
+    font-size:1rem;
 }
 
-.notice{
-    margin-top:28px;
-    padding:22px;
-    border-left:5px solid var(--accent);
-    background:#f8fafc;
+.features{
+    display:flex;
+
+    flex-wrap:wrap;
+
+    justify-content:center;
+
+    gap:10px;
+
+    margin:24px 0;
+}
+
+.feature{
+    text-decoration:none;
+
+    color:var(--primary);
+
+    border:1px solid var(--border);
+
     border-radius:12px;
+
+    padding:12px 18px;
+
+    font-size:.9rem;
+
+    font-weight:500;
+
+    transition:.2s ease;
 }
 
-.countdown-wrapper{
-    margin-top:35px;
-    text-align:center;
+.feature:hover{
+    border-color:var(--accent);
+
+    transform:translateY(-2px);
 }
 
 .countdown{
-    font-size:90px;
-    font-weight:800;
+    font-size:3.2rem;
+
+    font-weight:700;
+
     color:var(--accent);
+
     line-height:1;
+
+    margin-top:10px;
 }
 
-.countdown-label{
-    margin-top:10px;
-    color:#64748b;
-    font-size:1.1rem;
+.label{
+    margin-top:8px;
+
+    color:var(--secondary);
+
+    font-size:.95rem;
+}
+
+.progress{
+    width:100%;
+
+    max-width:340px;
+
+    height:6px;
+
+    margin:20px auto;
+
+    background:#e2e8f0;
+
+    border-radius:999px;
+
+    overflow:hidden;
+}
+
+.progress-bar{
+    width:100%;
+    height:100%;
+
+    background:var(--accent);
+
+    transition:width 1s linear;
 }
 
 .btn{
     display:inline-block;
-    margin-top:30px;
-    padding:14px 24px;
-    background:var(--accent);
-    color:white;
+
     text-decoration:none;
+
+    background:var(--accent);
+
+    color:white;
+
+    padding:14px 26px;
+
     border-radius:12px;
-    font-weight:700;
-    transition:.2s;
+
+    font-weight:600;
+
+    transition:.2s ease;
 }
 
 .btn:hover{
     transform:translateY(-2px);
 }
 
-.features{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
-    gap:12px;
-    margin-top:28px;
-}
-
-.feature{
-    background:#f8fafc;
-    padding:14px;
-    text-align:center;
-    border-radius:10px;
-    font-weight:600;
-}
-
 .footer{
-    margin-top:24px;
-    text-align:center;
-    color:#64748b;
-    font-size:.95rem;
+    margin-top:16px;
+
+    color:var(--secondary);
+
+    font-size:.85rem;
+}
+
+@media (max-width:768px){
+
+    body{
+        padding:10px;
+    }
+
+    .card{
+        padding:22px 18px;
+        border-radius:18px;
+    }
+
+    .lead{
+        font-size:.92rem;
+    }
+
+    .countdown{
+        font-size:2.6rem;
+    }
+
+    .features{
+        gap:8px;
+    }
+
+    .feature{
+        width:100%;
+    }
+
+    .btn{
+        width:100%;
+    }
+}
+
+@media (max-height:700px){
+
+    .card{
+        padding:18px;
+    }
+
+    .features{
+        margin:16px 0;
+    }
+
+    .countdown{
+        font-size:2.4rem;
+    }
 }
 </style>
 </head>
@@ -134,49 +257,68 @@ h1{
 
 <div class="card">
 
-    <span class="badge">Migración de Plataforma</span>
+    <div class="badge">
+        Plataforma en actualización
+    </div>
 
     <h1>Pasir Academy</h1>
 
     <p class="lead">
-        Domina la <strong>Electricidad Industrial</strong> desde cero hasta nivel práctico real.
-        Aprende a diseñar, simular y conectar circuitos eléctricos utilizados en entornos industriales.
+        Estamos actualizando nuestra infraestructura y mejorando nuestros servicios.
+        Mientras completamos la migración, puedes acceder a nuestro nuevo portal de contenidos tecnológicos.
     </p>
 
-    <div class="notice">
-        <strong>Actualización en progreso</strong><br><br>
-        La plataforma se encuentra actualmente en proceso de migración y actualización de infraestructura.
-        Durante esta transición podrás acceder a nuestro nuevo portal de contenidos tecnológicos.
-    </div>
-
     <div class="features">
-        <div class="feature"><a href="https://blog.anibalcopitan.com/search?q=dev">Programación</a></div>
-        <div class="feature"><a href="https://blog.anibalcopitan.com/search?q=linux">Linux</a></div>
-        <div class="feature"><a href="https://blog.anibalcopitan.com/search/label/app%20android">Android</a></div>
-        <div class="feature"><a href="https://blog.anibalcopitan.com/search/label/ia">Inteligencia Artificial</a></div>
-    </div>
 
-    <div class="countdown-wrapper">
-        <div id="countdown" class="countdown">7</div>
-        <div class="countdown-label">
-            Redirigiendo automáticamente al nuevo portal...
-        </div>
-
-        <a class="btn" href="https://blog.anibalcopitan.com">
-            Ir ahora
+        <a class="feature"
+           href="https://blog.anibalcopitan.com/search?q=dev">
+            Programación
         </a>
+
+        <a class="feature"
+           href="https://blog.anibalcopitan.com/search?q=linux">
+            Linux
+        </a>
+
+        <a class="feature"
+           href="https://blog.anibalcopitan.com/search/label/app%20android">
+            Android
+        </a>
+
+        <a class="feature"
+           href="https://blog.anibalcopitan.com/search/label/ia">
+            Inteligencia Artificial
+        </a>
+
     </div>
+
+    <div id="countdown" class="countdown">7</div>
+
+    <div class="label">
+        Redirigiendo automáticamente...
+    </div>
+
+    <div class="progress">
+        <div id="progress" class="progress-bar"></div>
+    </div>
+
+    <a class="btn"
+       href="https://blog.anibalcopitan.com">
+       Ir al portal ahora
+    </a>
 
     <div class="footer">
-        Si la redirección automática no funciona, utiliza el botón superior.
+        Si la redirección no funciona, utiliza el botón.
     </div>
 
 </div>
 
 <script>
-let seconds = 7;
+const TOTAL = 7;
+let seconds = TOTAL;
 
-const countdown = document.getElementById('countdown');
+const countdown = document.getElementById("countdown");
+const progress = document.getElementById("progress");
 
 const timer = setInterval(() => {
 
@@ -184,12 +326,19 @@ const timer = setInterval(() => {
 
     countdown.textContent = seconds;
 
+    progress.style.width =
+        ((seconds / TOTAL) * 100) + "%";
+
     if(seconds <= 0){
+
         clearInterval(timer);
-        window.location.href = "https://blog.anibalcopitan.com";
+
+        // window.location.replace(
+        //     "https://blog.anibalcopitan.com"
+        // );
     }
 
-}, 1000);
+},1000);
 </script>
 
 </body>
